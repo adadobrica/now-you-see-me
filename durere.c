@@ -50,9 +50,9 @@ void free_list(ll_t **list) {
 	*list = NULL;
 }
 
-void add_card(ll_t *deck, card_t card) {
-	node_t *new_node = malloc(deck->node_t);
-	new_node->data = malloc(deck->data_size));
+void add_card(ll_t *deck, const void *card) {
+	node_t *new_node = malloc(sizeof(node_t));
+	new_node->data = malloc(deck->data_size);
 	memcpy(new_node->data, card, deck->data_size);
 	new_node->next = NULL;
 	new_node->prev = NULL;
@@ -77,16 +77,40 @@ void add_card(ll_t *deck, card_t card) {
 	deck->size++;
 }
 
-int add_deck_to_list(ll_t deck, ll_t *list) {
+int add_deck_to_list(const void *deck, ll_t *list) {
+	node_t *new_node = malloc(sizeof(node_t));
+	new_node->data = malloc(list->data_size);
+	memcpy(new_node->data, deck, list->data_size);
+	new_node->next = NULL;
+	new_node->prev = NULL;
+
 	if (list->size == 0) {
-		list->head = deck;
+		list->head = new_node;
 		list->size++;
+		return 1;
 	}
+
+	node_t *node = list->head;
+	while (node->next != NULL) {
+		node = node->next;
+	}
+
+	node_t *next_node = node->next;
+	node->next = new_node;
+
+	if (next_node != NULL) {
+		next_node->prev = new_node;
+	}
+
+	new_node->next = next_node;
+	new_node->prev = node;
+	list->size++;
+	return 1;
 	
 }
 
 int check_valid_card(card_t *card) {
-	char sym[] = {HEART, CLUB, DIAMOND, SPADE};
+	char sym[4][MAX_SYMBOL_SIZE] = {"HEART", "CLUB", "DIAMOND", "SPADE"};
 	if (card->value < 1 && card->value > 14) {
 		return 0;
 	}
@@ -105,7 +129,7 @@ int check_valid_card(card_t *card) {
 int main(void) {
 	ll_t *my_list = list_create(sizeof(ll_t *));
 	char command[STRING_SIZE];
-	int num_cards, num, check;
+	int num_cards, num, check = 0;
 	while (1) {
 		scanf("%s", command);
 		if (strcmp(command, "ADD_DECK") == 0) {
@@ -119,12 +143,12 @@ int main(void) {
 					printf(INVALID_CARD);
 					continue;
 				}
-				add_card(&deck, deck_card);
-				num++;
-				check = add_deck_to_list(deck, &my_list);
-				if (check == 1) {
-					printf(ADDED_DECK, num_cards);
-				}
+				add_card(deck, &deck_card);
+				num++; 
+			}
+			check = add_deck_to_list(&deck, my_list);
+			if (check == 1) {
+				printf(ADDED_DECK, num_cards);
 			}
 
 		} else if (strcmp(command, "DEL_DECK") == 0) {
