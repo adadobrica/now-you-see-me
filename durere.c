@@ -4,6 +4,7 @@
 
 #define STRING_SIZE 256
 #define MAX_SYMBOL_SIZE 8
+#define NUM_SYMBOLS 4
 #define DECK_INDEX_OUT_OF_BOUNDS "The provided index is out of bounds \
 												for the deck list.\n"
 #define CARD_INDEX_OUT_OF_BOUNDS "The provided index is out of bounds \
@@ -110,7 +111,7 @@ int add_deck_to_list(const void *deck, ll_t *list) {
 }
 
 int check_valid_card(card_t *card) {
-	char sym[4][MAX_SYMBOL_SIZE] = {"HEART", "CLUB", "DIAMOND", "SPADE"};
+	char sym[NUM_SYMBOLS][MAX_SYMBOL_SIZE] = {"HEART", "CLUB", "DIAMOND", "SPADE"};
 	if (card->value < 1 && card->value > 14) {
 		return 0;
 	}
