@@ -52,12 +52,24 @@ void free_list(ll_t **list) {
 	node_t *aux = (*list)->head;
 	while (aux) {
 		node_t *next = aux->next;
-		free(aux);
 		free(aux->data);
+		free(aux);
 		aux = next;
 	}
 	free(*list);
 	*list = NULL;
+}
+
+void free_main_list(ll_t **list) {
+	node_t *current = (*list)->head;
+	ll_t *current_list;
+	while (current) {
+		current_list = *(ll_t **)current->data;
+		free_list(&current_list);
+		free(current->data);
+		free(current);
+		current = current->next;
+	}
 }
 
 void add_card(ll_t *deck, const void *card) {
@@ -130,6 +142,12 @@ void delete_deck(ll_t *list, int index) {
 		printf(DECK_INDEX_OUT_OF_BOUNDS);
 		return;
 	}
+	if (node == list->head) {
+		list->head = list->head->next;
+		list->size--;
+		printf(DELETED_DECK, index);
+		return;
+	}
 	while (node->next != NULL && --index > 0) {
 		node = node->next;
 	}
@@ -137,9 +155,6 @@ void delete_deck(ll_t *list, int index) {
 	node_t *next = node->next;
 	prev->next = next;
 	next->prev = prev;
-	if (node == list->head) {
-		list->head = next;
-	}
 	list->size--;
 	printf(DELETED_DECK, index);
 }
@@ -450,8 +465,7 @@ int main(void) {
 		} else if (strcmp(command, "SHOW_ALL") == 0) {
 			show_all(my_list);
 		} else if (strcmp(command, "EXIT") == 0) {
-			free_list(&my_list);
-			//free_list(&deck); 
+			free_main_list(&my_list); 
 			break;
 		} else {
 			printf(INVALID_COMMAND);
