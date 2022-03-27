@@ -8,7 +8,7 @@
 #define DECK_INDEX_OUT_OF_BOUNDS "The provided index is out of bounds \
 												for the deck list.\n"
 #define CARD_INDEX_OUT_OF_BOUNDS "The provided index is out of bounds \
-												for deck %ld.\n"
+												for deck %d.\n"
 #define INVALID_CARD "The provided card is not a valid one.\n"
 #define INVALID_COMMAND "Invalid command. Please try again.\n"
 #define ADDED_DECK "The deck was successfully created with %d cards.\n"
@@ -189,13 +189,13 @@ void add_cards(ll_t *list, int index, int num) {
 	int nr = 0;
 	card_t new_card;
 	while (nr != num) {
-		scanf("%d %s", new_card.value, new_card.symbol);
+		scanf("%d %s", &new_card.value, new_card.symbol);
 		int ok = check_valid_card(&new_card);
 		if (ok == 0) {
 			printf(INVALID_CARD);
 			return;
 		}
-		add_card(current_deck, &new_card);
+		add_card(*(ll_t **)current_deck->data, &new_card);
 		nr++;
 	}
 	printf(ADD_CARDS, index);
@@ -280,10 +280,10 @@ void merge_decks(ll_t *list, int d_index1, int d_index2) {
 
 void add_nth_node(ll_t *list, int n, const void *card) {
 	node_t *new_card = malloc(sizeof(node_t));
-	new_node->data = malloc(sizeof(card_t));
-	memcpy(new_node->data, card, sizeof(card_t));
-	new_node->next = NULL;
-	new_node->prev = NULL;
+	new_card->data = malloc(sizeof(card_t));
+	memcpy(new_card->data, card, sizeof(card_t));
+	new_card->next = NULL;
+	new_card->prev = NULL;
 
 	node_t *node = list->head;
 	while (node->next != NULL && --n > 0) {
@@ -291,23 +291,23 @@ void add_nth_node(ll_t *list, int n, const void *card) {
 	}
 
 	node_t *next = node->next;
-	node->next = new_node;
+	node->next = new_card;
 	if (next != NULL) {
-		next->prev = new_node;
+		next->prev = new_card;
 	}
-	new_node->next = next;
-	new_node->prev = node;
+	new_card->next = next;
+	new_card->prev = node;
 	list->size++;
 }
 
 void remove_nth_node(ll_t *list, int n) {
-	ll_t *node = list->head;
+	node_t *node = list->head;
 	while (node->next && --n > 0) {
 		node = node->next;
 	}
 
-	ll_t *prev = node->prev;
-	ll_t *next = node->next;
+	node_t *prev = node->prev;
+	node_t *next = node->next;
 
 	prev->next = next;
 	next->prev = prev;
@@ -385,11 +385,11 @@ void show_deck(ll_t *list, int deck_index) {
 	printf("Deck %d:\n", deck_index);
 
 	node_t *curr = deck->head;
-	card_t card = curr->data;
+	card_t card = *(card_t*)curr->data;
 	while (curr) {
 		printf("\t%d %s\n", card.value, card.symbol);
 		curr = curr->next;
-		card = curr->data;
+		card = *(card_t *)curr->data;
 	}
 }
 
@@ -409,7 +409,7 @@ int main(void) {
 	ll_t *my_list = list_create(sizeof(ll_t *));
 	ll_t *deck;
 	char command[STRING_SIZE];
-	int num_cards, num, check = 0, deck_index, card_index;
+	int num_cards, num, check = 0, deck_index, card_index, i1, i2;
 	while (1) {
 		scanf("%s", command);
 		if (strcmp(command, "ADD_DECK") == 0) {
@@ -436,7 +436,7 @@ int main(void) {
 			delete_deck(my_list, deck_index);
 		} else if (strcmp(command, "DEL_CARD") == 0) {
 			scanf("%d %d", &deck_index, &card_index);
-			delete_card(my_list, &deck, deck_index, card_index);
+			delete_card(my_list, deck, deck_index, card_index);
 		} else if (strcmp(command, "ADD_CARDS") == 0) {
 			scanf("%d %d", &deck_index, &num_cards);
 			add_cards(my_list, deck_index, num_cards);
@@ -446,17 +446,22 @@ int main(void) {
 			scanf("%d", &deck_index);
 			get_deck_len(my_list, deck_index);
 		} else if (strcmp(command,  "SHUFFLE_DECK") == 0) {
-			
+			scanf("%d", &deck_index);
+			shuffle_deck(my_list, deck_index);
 		} else if (strcmp(command, "MERGE_DECKS") == 0) {
-			//TO DO
+			scanf("%d %d", &i1, &i2);
+			merge_decks(my_list, i1, i2);
 		} else if (strcmp(command, "SPLIT_DECKS") == 0) {
-			//TO DO
+			scanf("%d %d", &i1, &i2);
+			split_deck(my_list, i1, i2);
 		} else if (strcmp(command, "REVERSE_DECK") == 0) {
-			//TO DO
+			scanf("%d", &deck_index);
+			reverse_deck(my_list, deck_index);
 		} else if (strcmp(command, "SHOW_DECK") == 0) {
-			//TO DO
+			scanf("%d", &deck_index);
+			show_deck(my_list, deck_index);
 		} else if (strcmp(command, "SHOW_ALL") == 0) {
-			//TO DO
+			show_all(my_list);
 		} else if (strcmp(command, "EXIT") == 0) {
 			free_list(&my_list);
 			//free_list(&deck); 
