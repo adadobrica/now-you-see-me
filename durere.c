@@ -214,8 +214,8 @@ void get_deck_len(ll_t *list, int deck_index) {
 		current_deck = current_deck->next;
 	}
 
-	ll_t *deck = list_create(sizeof(node_t));
-	deck = current_deck;
+	ll_t *deck;
+	deck = (ll_t*)current_deck->data;
 	int length = deck->size;
 	printf(DECK_LEN, deck_index);
 
