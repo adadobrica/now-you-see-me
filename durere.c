@@ -195,7 +195,7 @@ void add_cards(ll_t *list, int index, int num) {
 			printf(INVALID_CARD);
 			return;
 		}
-		add_card(current_deck, new_card);
+		add_card(current_deck, &new_card);
 		nr++;
 	}
 	printf(ADD_CARDS, index);
@@ -215,37 +215,107 @@ void get_deck_len(ll_t *list, int deck_index) {
 	}
 
 	ll_t *deck;
-	deck = (ll_t*)current_deck->data;
+	deck = *(ll_t **)current_deck->data;
 	int length = deck->size;
 	printf(DECK_LEN, deck_index);
 
 }
 
+node_t* get_nth_node(ll_t *list, int n) {
+	node_t *curr = list->head;
+	while (curr != NULL && --n > 0) {
+		curr = curr->next;
+	}
+	return curr;
+}
+
 void shuffle_deck(ll_t *list, int deck_index) {
-	/*
-	-inverseaza prima si a doua jumatate a pachetului <index_pachet>
-	-prima jumatate contine primele n/2 carti, iar a doua jumatate
-	contine n/2 carti (n par) sau n/2 + 1 carti(n impar), unde n este
-	nr de carti din pachet
-	-dupa finalizarea comenzii se va afisa msj ...
-	ex:
-	pachet 0: 1, 2, 3, 4, 5
-	rezultat: 3, 4, 5, 1, 2
-	*/
+	int d_size;
+	node_t *d = get_nth_node(list, deck_index);
+	ll_t *deck = *(ll_t **)d->data;
+
+	if (deck->size % 2 == 0) {
+		d_size = deck->size / 2;
+	} else {
+		d_size = deck->size / 2 + 1;
+	}
+	int i = 0;
+	node_t *curr = deck->head;
+	node_t *tmp = NULL;
+	while (i != d_size) {
+		tmp = curr->prev;
+		curr->prev = curr->next;
+		curr->next = tmp;
+		curr = curr->prev;
+		i++;
+	}
+	printf(SHUFFLE_DECK, deck_index);
 }
 
 void merge_decks(ll_t *list, int d_index1, int d_index2) {
-	/*
-	-combina pachetele index1 si index2 luand cate o carte din fiecare
-	pachet rand pe rand
-	-cele doua pachete combinate vor fi sterse, iar pachetul rezultat
-	va fi adaugat la finalul listei de pachete
-	- + msj de la final
-	ex:
-	pachet 0: 1, 2, 3, 4
-	pachet 1: 4, 5, 6, 7, 11, 12, 13
-	rezultat: 1, 4, 2, 5, 3, 6, 4, 7, 11, 12, 13
-	*/
+	node_t *d1 = get_nth_node(list, d_index1);
+	node_t *d2 = get_nth_node(list, d_index2);
+	ll_t *deck1 = *(ll_t **)d1->data;
+	ll_t *deck2 = *(ll_t **)d2->data;
+
+	ll_t *merged_deck = list_create(sizeof(ll_t));
+
+	node_t *curr1 = deck1->head, *curr2 = deck2->head;
+
+	while (curr1 != NULL && curr2 != NULL) {
+		add_card(merged_deck, curr1);
+		add_card(merged_deck, curr2);
+		curr1 = curr1->next;
+		curr2 = curr2->next;
+	}
+
+	while (curr1) {
+		add_card(merged_deck, curr1);
+	}
+	while (curr2) {
+		add_card(merged_deck, curr2);
+	}
+	printf(MERGE_DECKS, d_index1, d_index2);
+}
+
+void add_nth_node(ll_t *list, int n, const void *card) {
+	node_t *new_card = malloc(sizeof(node_t));
+	new_node->data = malloc(sizeof(card_t));
+	memcpy(new_node->data, card, sizeof(card_t));
+	new_node->next = NULL;
+	new_node->prev = NULL;
+
+	node_t *node = list->head;
+	while (node->next != NULL && --n > 0) {
+		node = node->next;
+	}
+
+	node_t *next = node->next;
+	node->next = new_node;
+	if (next != NULL) {
+		next->prev = new_node;
+	}
+	new_node->next = next;
+	new_node->prev = node;
+	list->size++;
+}
+
+void remove_nth_node(ll_t *list, int n) {
+	ll_t *node = list->head;
+	while (node->next && --n > 0) {
+		node = node->next;
+	}
+
+	ll_t *prev = node->prev;
+	ll_t *next = node->next;
+
+	prev->next = next;
+	next->prev = prev;
+
+	if (node == list->head) {
+		list->head = next;
+	}
+	list->size--;
 }
 
 void split_deck(ll_t *list, int d_index, int split_index) {
@@ -268,37 +338,71 @@ void split_deck(ll_t *list, int d_index, int split_index) {
 		Pachet 2: 7, 8, 9
 		Pachet 3: 12, 13, 14
 	*/
+	ll_t *l1 = list_create(sizeof(card_t));
+	ll_t *l2 = list_create(sizeof(card_t));
+
+	node_t *d = get_nth_node(list, d_index);
+	ll_t *deck = *(ll_t **)d->data;
+
+	node_t *curr = deck->head;
+	int i = 0;
+	while (i != split_index) {
+		add_card(l1, curr->data);
+		i++;
+	}
+
+	int j = deck->size - split_index + 1;
+
+	while (j != deck->size) {
+		add_card(l2, curr->data);
+		j++;
+	}
+
 }
 
 void reverse_deck(ll_t *list, int deck_index) {
-	/*
-	- inverseaza ordinea cartilor din pachetul index
+	node_t *d = get_nth_node(list, deck_index);
+	ll_t *deck = *(ll_t **)d->data;
 
-	*/
+	node_t *tmp = NULL;
+	node_t *curr = deck->head;
+
+	while (curr != NULL) {
+		tmp = curr->prev;
+		curr->prev = curr->next;
+		curr->next = tmp;
+		curr = curr->prev;
+	}
+	if (tmp != NULL) {
+		deck->head = tmp->prev;
+	}
+	printf(REVERSE_DECK, deck_index);
 }
 
 void show_deck(ll_t *list, int deck_index) {
-	/*
-	-afiseaza cartile din pachetul deck_index
-	- structura: <index_pachet> - {valoare1, simbol1}, {val2, sim2}, ..
-	-mesajul afisat pe ecran va fi de forma:
-	Deck <index_pachet> :\n
-	\t<valoare_carte1> <simbol_carte1>\n
-	\t<valoare_carte2> <simbol_carte2>\n
-	.....
-	*/
+	node_t *d = get_nth_node(list, deck_index);
+	ll_t *deck = *(ll_t **)d->data;
+	printf("Deck %d:\n", deck_index);
+
+	node_t *curr = deck->head;
+	card_t card = curr->data;
+	while (curr) {
+		printf("\t%d %s\n", card.value, card.symbol);
+		curr = curr->next;
+		card = curr->data;
+	}
 }
 
 void show_all(ll_t *list) {
-	/*
-	mesajul va fi de forma:
-	Deck <index_pachet1>:\n
-	\t<valoare_carte1> <simbol_carte1>\n
-	.....
-	Deck <index_pachet2>:\n
-	\t<val_carte1> <sim_carte1>\n
-	....
-	*/
+	node_t *curr = list->head;
+	ll_t *deck = *(ll_t **)curr->data;
+	int index = 0;
+	while (curr) {
+		show_deck(deck, index);
+		curr = curr->next;
+		deck = *(ll_t **)curr->data;
+		index++;
+	}
 }
 
 int main(void) {
@@ -342,7 +446,7 @@ int main(void) {
 			scanf("%d", &deck_index);
 			get_deck_len(my_list, deck_index);
 		} else if (strcmp(command,  "SHUFFLE_DECK") == 0) {
-			scanf("")
+			
 		} else if (strcmp(command, "MERGE_DECKS") == 0) {
 			//TO DO
 		} else if (strcmp(command, "SPLIT_DECKS") == 0) {
