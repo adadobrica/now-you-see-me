@@ -221,6 +221,86 @@ void get_deck_len(ll_t *list, int deck_index) {
 
 }
 
+void shuffle_deck(ll_t *list, int deck_index) {
+	/*
+	-inverseaza prima si a doua jumatate a pachetului <index_pachet>
+	-prima jumatate contine primele n/2 carti, iar a doua jumatate
+	contine n/2 carti (n par) sau n/2 + 1 carti(n impar), unde n este
+	nr de carti din pachet
+	-dupa finalizarea comenzii se va afisa msj ...
+	ex:
+	pachet 0: 1, 2, 3, 4, 5
+	rezultat: 3, 4, 5, 1, 2
+	*/
+}
+
+void merge_decks(ll_t *list, int d_index1, int d_index2) {
+	/*
+	-combina pachetele index1 si index2 luand cate o carte din fiecare
+	pachet rand pe rand
+	-cele doua pachete combinate vor fi sterse, iar pachetul rezultat
+	va fi adaugat la finalul listei de pachete
+	- + msj de la final
+	ex:
+	pachet 0: 1, 2, 3, 4
+	pachet 1: 4, 5, 6, 7, 11, 12, 13
+	rezultat: 1, 4, 2, 5, 3, 6, 4, 7, 11, 12, 13
+	*/
+}
+
+void split_deck(ll_t *list, int d_index, int split_index) {
+	/* 
+	- imparte pachetul d_index dupa indexul split_index
+	- primul pachet rezultat va ramane la d_index, iar al
+	doilea pachet rezultat se va insera la pozitia d_index + 1
+	- daca in urma comenzii rezulta un pachet gol si un pachet
+	ce contine toate cartile (split_index == 0), se va pastra doar
+	pachetul ce contine carti
+
+	ex: 
+	pachet 0: 1, 2, 3, 4
+	pachet 1: 7, 8, 9
+	pachet 2: 12, 13, 14
+	SPLIT_DECK 0 2
+	Rezultate:
+		Pachet 1a: 1, 2
+		Pachet 1b: 3, 4
+		Pachet 2: 7, 8, 9
+		Pachet 3: 12, 13, 14
+	*/
+}
+
+void reverse_deck(ll_t *list, int deck_index) {
+	/*
+	- inverseaza ordinea cartilor din pachetul index
+
+	*/
+}
+
+void show_deck(ll_t *list, int deck_index) {
+	/*
+	-afiseaza cartile din pachetul deck_index
+	- structura: <index_pachet> - {valoare1, simbol1}, {val2, sim2}, ..
+	-mesajul afisat pe ecran va fi de forma:
+	Deck <index_pachet> :\n
+	\t<valoare_carte1> <simbol_carte1>\n
+	\t<valoare_carte2> <simbol_carte2>\n
+	.....
+	*/
+}
+
+void show_all(ll_t *list) {
+	/*
+	mesajul va fi de forma:
+	Deck <index_pachet1>:\n
+	\t<valoare_carte1> <simbol_carte1>\n
+	.....
+	Deck <index_pachet2>:\n
+	\t<val_carte1> <sim_carte1>\n
+	....
+	*/
+}
+
 int main(void) {
 	ll_t *my_list = list_create(sizeof(ll_t *));
 	ll_t *deck;
@@ -259,9 +339,10 @@ int main(void) {
 		} else if (strcmp(command, "DECK_NUMBER") == 0) {
 			get_deck_number(my_list);
 		} else if (strcmp(command, "DECK_LEN") == 0) {
-			//TO DO
+			scanf("%d", &deck_index);
+			get_deck_len(my_list, deck_index);
 		} else if (strcmp(command,  "SHUFFLE_DECK") == 0) {
-			//TO DO
+			scanf("")
 		} else if (strcmp(command, "MERGE_DECKS") == 0) {
 			//TO DO
 		} else if (strcmp(command, "SPLIT_DECKS") == 0) {
