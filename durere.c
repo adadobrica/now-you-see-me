@@ -77,12 +77,7 @@ void add_card(ll_t *deck, const void *card) {
 	while (node->next != NULL) {
 		node = node->next;
 	}
-	node_t *next_node = node->next;
 	node->next = new_node;
-	if (next_node != NULL) {
-		next_node->prev = new_node;
-	}
-	new_node->next = next_node;
 	new_node->prev = node;
 	deck->size++;
 }
@@ -105,14 +100,7 @@ int add_deck_to_list(const void *deck, ll_t *list) {
 		node = node->next;
 	}
 
-	node_t *next_node = node->next;
 	node->next = new_node;
-
-	if (next_node != NULL) {
-		next_node->prev = new_node;
-	}
-
-	new_node->next = next_node;
 	new_node->prev = node;
 	list->size++;
 	return 1;
@@ -207,48 +195,48 @@ void get_deck_number(ll_t *list) {
 	printf(DECK_NUMBER, num);
 }
 
-void get_deck_len(ll_t *list, int deck_index) {
-	node_t *current_deck = list->head;
+node_t* get_nth_node(ll_t *list, int n) {
+	node_t *curr = list->head;
+	while (curr != NULL && n-- > 0) {
+		curr = curr->next;
+	}
+	return curr;
+}
 
-	while (current_deck->next != NULL && --deck_index > 0) {
+void get_deck_len(ll_t *list, int deck_index) {
+	node_t *current_deck = get_nth_node(list, deck_index);
+	int index = deck_index;
+	while (current_deck->next != NULL && --index > 0) {
 		current_deck = current_deck->next;
 	}
 
 	ll_t *deck;
 	deck = *(ll_t **)current_deck->data;
 	int length = deck->size;
-	printf(DECK_LEN, deck_index);
+	printf(DECK_LEN, deck_index, length);
 
 }
 
-node_t* get_nth_node(ll_t *list, int n) {
-	node_t *curr = list->head;
-	while (curr != NULL && --n > 0) {
-		curr = curr->next;
-	}
-	return curr;
-}
 
 void shuffle_deck(ll_t *list, int deck_index) {
-	int d_size;
 	node_t *d = get_nth_node(list, deck_index);
 	ll_t *deck = *(ll_t **)d->data;
-
-	if (deck->size % 2 == 0) {
-		d_size = deck->size / 2;
-	} else {
-		d_size = deck->size / 2 + 1;
+	int	d_size = deck->size / 2;
+	if (deck->size == 1) {
+			printf(SHUFFLE_DECK, deck_index);
+			return;
 	}
-	int i = 0;
-	node_t *curr = deck->head;
-	node_t *tmp = NULL;
-	while (i != d_size) {
-		tmp = curr->prev;
-		curr->prev = curr->next;
-		curr->next = tmp;
-		curr = curr->prev;
-		i++;
+	node_t *head = deck->head;
+	node_t *tmp = get_nth_node(deck, d_size);
+	node_t *tail = deck->head;
+	while (tail->next != NULL) {
+			tail = tail->next;
 	}
+	tmp->prev->next = NULL;
+	tmp->prev = NULL;
+	head->prev = tail;
+	tail->next = head;
+	deck->head = tmp;
 	printf(SHUFFLE_DECK, deck_index);
 }
 
@@ -379,28 +367,25 @@ void reverse_deck(ll_t *list, int deck_index) {
 	printf(REVERSE_DECK, deck_index);
 }
 
-void show_deck(ll_t *list, int deck_index) {
-	node_t *d = get_nth_node(list, deck_index);
-	ll_t *deck = *(ll_t **)d->data;
+void show_deck(ll_t *deck, int deck_index) {
 	printf("Deck %d:\n", deck_index);
 
 	node_t *curr = deck->head;
-	card_t card = *(card_t*)curr->data;
 	while (curr) {
+		card_t card = *(card_t *)curr->data;
 		printf("\t%d %s\n", card.value, card.symbol);
 		curr = curr->next;
-		card = *(card_t *)curr->data;
 	}
 }
 
 void show_all(ll_t *list) {
 	node_t *curr = list->head;
-	ll_t *deck = *(ll_t **)curr->data;
+	ll_t *deck;
 	int index = 0;
 	while (curr) {
+		deck = *(ll_t **)curr->data;	
 		show_deck(deck, index);
 		curr = curr->next;
-		deck = *(ll_t **)curr->data;
 		index++;
 	}
 }
@@ -459,7 +444,9 @@ int main(void) {
 			reverse_deck(my_list, deck_index);
 		} else if (strcmp(command, "SHOW_DECK") == 0) {
 			scanf("%d", &deck_index);
-			show_deck(my_list, deck_index);
+	        node_t *d = get_nth_node(my_list, deck_index);
+			ll_t *s_deck = *(ll_t **)d->data;
+			show_deck(s_deck, deck_index);
 		} else if (strcmp(command, "SHOW_ALL") == 0) {
 			show_all(my_list);
 		} else if (strcmp(command, "EXIT") == 0) {
