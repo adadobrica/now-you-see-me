@@ -59,6 +59,7 @@ void free_list(ll_t **list) {
 	free(*list);
 	*list = NULL;
 }
+node_t* get_nth_node(ll_t *list, int n);
 
 void free_main_list(ll_t **list) {
 	node_t *current = (*list)->head;
@@ -66,11 +67,21 @@ void free_main_list(ll_t **list) {
 	while (current) {
 		current_list = *(ll_t **)current->data;
 		free_list(&current_list);
-		free(current->data);
-		free(current);
 		current = current->next;
 	}
+	free_list(list);
+	
+	/*int index = 0;
+	while (index != (*list)->size) {
+			node_t *current = get_nth_node((*list), index);
+			ll_t *current_deck = *(ll_t **)current->data;
+			free_list(&current_deck);
+			free(current->data);
+			free(current);
+			index++;
+	}
 	free(*list);
+	*/
 }
 
 void add_card(ll_t *deck, const void *card) {
@@ -143,50 +154,81 @@ void delete_deck(ll_t *list, int index) {
 		printf(DECK_INDEX_OUT_OF_BOUNDS);
 		return;
 	}
+	/*
 	if (node == list->head) {
 		list->head = list->head->next;
 		list->size--;
 		printf(DELETED_DECK, index);
 		return;
-	}
-	while (node->next != NULL && --index > 0) {
+	} */
+	int ind = index;
+	while (node->next != NULL && ind-- > 0) {
 		node = node->next;
+	}
+	node_t *deleted_node = get_nth_node(list, index);
+	ll_t *deleted_deck = *(ll_t **)deleted_node->data;
+	if (node == list->head) {
+			list->head = list->head->next;
+			list->size--;
+			free_list(&deleted_deck);
+			free(node->data);
+			free(node);
+			printf(DELETED_DECK, index);
+			return;
 	}
 	node_t *prev = node->prev;
 	node_t *next = node->next;
 	prev->next = next;
-	next->prev = prev;
+	if (next != NULL) {
+			next->prev = prev;
+	}
 	list->size--;
+	free_list(&deleted_deck);
+	free(node->data);
+	free(node);
 	printf(DELETED_DECK, index);
 }
 
-void delete_card(ll_t *list, ll_t *deck, int d_index, int c_index) {
+void delete_card(ll_t *list, int d_index, int c_index) {
+	node_t *d = get_nth_node(list, d_index);
+	ll_t *deck = *(ll_t **)d->data;
 	node_t *node = deck->head;
+	
+	if (deck->size == 0) {
+		delete_deck(list, d_index);
+		return;
+	}
 	if (c_index < 0) {
 		printf(CARD_INDEX_OUT_OF_BOUNDS);
 		return;
 	}
-	while (node->next != NULL && --c_index > 0) {
+	while (node->next != NULL && c_index-- > 0) {
 		node = node->next;
+	}
+	if (node == deck->head) {
+			deck->head = deck->head->next;
+			deck->size--;
+			free(node->data);
+			free(node);
+			printf(DELETED_CARD, d_index);
+			return;
 	}
 	node_t *prev = node->prev;
 	node_t *next = node->next;
 	prev->next = next;
-	next->prev = prev;
-	if (node == deck->head) {
-		deck->head = next;
+	if (next != NULL) {
+			next->prev = prev;
 	}
 	deck->size--;
+	free(node->data);
+	free(node);
 	printf(DELETED_CARD, d_index);
-	if (deck->size == 0) {
-		delete_deck(list, d_index);
-	}
 }
 
 void add_cards(ll_t *list, int index, int num) {
 	node_t *current_deck = list->head;
-
-	while (current_deck->next != NULL && --index > 0) {
+	int ind = index;
+	while (current_deck->next != NULL && ind-- > 0) {
 		current_deck = current_deck->next;
 	}
 
@@ -437,7 +479,7 @@ int main(void) {
 			delete_deck(my_list, deck_index);
 		} else if (strcmp(command, "DEL_CARD") == 0) {
 			scanf("%d %d", &deck_index, &card_index);
-			delete_card(my_list, deck, deck_index, card_index);
+			delete_card(my_list, deck_index, card_index);
 		} else if (strcmp(command, "ADD_CARDS") == 0) {
 			scanf("%d %d", &deck_index, &num_cards);
 			add_cards(my_list, deck_index, num_cards);
@@ -473,11 +515,10 @@ int main(void) {
 		} else if (strcmp(command, "SHOW_ALL") == 0) {
 			show_all(my_list);
 		} else if (strcmp(command, "EXIT") == 0) {
-			free_main_list(&my_list); 
+			free_main_list(&my_list);
 			break;
 		} else {
 			printf(INVALID_COMMAND);
-			break;
 		}
 	}
 	return 0;
