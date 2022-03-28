@@ -70,6 +70,7 @@ void free_main_list(ll_t **list) {
 		free(current);
 		current = current->next;
 	}
+	free(*list);
 }
 
 void add_card(ll_t *deck, const void *card) {
@@ -447,7 +448,14 @@ int main(void) {
 			get_deck_len(my_list, deck_index);
 		} else if (strcmp(command,  "SHUFFLE_DECK") == 0) {
 			scanf("%d", &deck_index);
-			shuffle_deck(my_list, deck_index);
+			char garbage[100];
+			fgets(garbage, 99, stdin);
+			int len = strlen(garbage);
+			if (len == 1) {
+				shuffle_deck(my_list, deck_index);
+			} else {
+				printf(INVALID_COMMAND);
+			}
 		} else if (strcmp(command, "MERGE_DECKS") == 0) {
 			scanf("%d %d", &i1, &i2);
 			merge_decks(my_list, i1, i2);
@@ -469,6 +477,7 @@ int main(void) {
 			break;
 		} else {
 			printf(INVALID_COMMAND);
+			break;
 		}
 	}
 	return 0;
