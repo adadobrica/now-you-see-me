@@ -262,7 +262,7 @@ void merge_decks(ll_t *list, int d_index1, int d_index2) {
 	ll_t *deck1 = *(ll_t **)d1->data;
 	ll_t *deck2 = *(ll_t **)d2->data;
 
-	ll_t *merged_deck = list_create(sizeof(ll_t));
+	ll_t *merged_deck = list_create(sizeof(card_t));
 
 	node_t *curr1 = deck1->head, *curr2 = deck2->head;
 
