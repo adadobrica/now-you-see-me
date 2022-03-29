@@ -317,10 +317,15 @@ void merge_decks(ll_t *list, int d_index1, int d_index2) {
 
 	while (curr1) {
 		add_card(merged_deck, curr1);
+		curr1 = curr1->next;
 	}
 	while (curr2) {
 		add_card(merged_deck, curr2);
+		curr2 = curr2->next;
 	}
+	add_deck_to_list(merged_deck, list);
+	delete_deck(list, d_index1);
+	delete_deck(list, d_index2);
 	printf(MERGE_DECKS, d_index1, d_index2);
 }
 
