@@ -298,6 +298,28 @@ void shuffle_deck(ll_t *list, int deck_index) {
 	printf(SHUFFLE_DECK, deck_index);
 }
 
+void add_nth_node(ll_t *list, int n, const void *card) {
+	node_t *new_card = malloc(sizeof(node_t));
+	new_card->data = malloc(sizeof(card_t));
+	memcpy(new_card->data, card, sizeof(card_t));
+	new_card->next = NULL;
+	new_card->prev = NULL;
+
+	node_t *node = list->head;
+	while (node->next != NULL && --n > 0) {
+		node = node->next;
+	}
+
+	node_t *next = node->next;
+	node->next = new_card;
+	if (next != NULL) {
+		next->prev = new_card;
+	}
+	new_card->next = next;
+	new_card->prev = node;
+	list->size++;
+}
+
 void merge_decks(ll_t *list, int d_index1, int d_index2) {
 	node_t *d1 = get_nth_node(list, d_index1);
 	node_t *d2 = get_nth_node(list, d_index2);
@@ -323,33 +345,14 @@ void merge_decks(ll_t *list, int d_index1, int d_index2) {
 		add_card(merged_deck, curr2);
 		curr2 = curr2->next;
 	}
-	add_deck_to_list(merged_deck, list);
+	
+
 	delete_deck(list, d_index1);
 	delete_deck(list, d_index2);
+	add_deck_to_list(merged_deck, list);
 	printf(MERGE_DECKS, d_index1, d_index2);
 }
 
-void add_nth_node(ll_t *list, int n, const void *card) {
-	node_t *new_card = malloc(sizeof(node_t));
-	new_card->data = malloc(sizeof(card_t));
-	memcpy(new_card->data, card, sizeof(card_t));
-	new_card->next = NULL;
-	new_card->prev = NULL;
-
-	node_t *node = list->head;
-	while (node->next != NULL && --n > 0) {
-		node = node->next;
-	}
-
-	node_t *next = node->next;
-	node->next = new_card;
-	if (next != NULL) {
-		next->prev = new_card;
-	}
-	new_card->next = next;
-	new_card->prev = node;
-	list->size++;
-}
 
 void remove_nth_node(ll_t *list, int n) {
 	node_t *node = list->head;
