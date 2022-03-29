@@ -299,24 +299,24 @@ void shuffle_deck(ll_t *list, int deck_index) {
 }
 
 void add_nth_node(ll_t *list, int n, const void *card) {
-	node_t *new_card = malloc(sizeof(node_t));
-	new_card->data = malloc(sizeof(card_t));
-	memcpy(new_card->data, card, sizeof(card_t));
-	new_card->next = NULL;
-	new_card->prev = NULL;
-
-	node_t *node = list->head;
-	while (node->next != NULL && --n > 0) {
-		node = node->next;
+	node_t *prev, *curr, *new_node;
+	curr = list->head;
+	prev = NULL;
+	while (n > 0) {
+		prev = curr;
+		curr = curr->next;
+		--n;
 	}
+	new_node = malloc(sizeof(node_t));
+	new_node->data = malloc(sizeof(card_t));
+	memcpy(new_node->data, card, sizeof(card_t));
 
-	node_t *next = node->next;
-	node->next = new_card;
-	if (next != NULL) {
-		next->prev = new_card;
+	new_node->next = curr;
+	if (prev == NULL) {
+			list->head = new_node;
+	} else {
+			prev->next = new_node;
 	}
-	new_card->next = next;
-	new_card->prev = node;
 	list->size++;
 }
 
@@ -329,27 +329,42 @@ void merge_decks(ll_t *list, int d_index1, int d_index2) {
 	ll_t *merged_deck = list_create(sizeof(card_t));
 
 	node_t *curr1 = deck1->head, *curr2 = deck2->head;
-
+	int current_index1 = 0, current_index2 = 0, m_index = 0;
+	node_t *c1, *c2;
+	card_t *card1, *card2;
 	while (curr1 != NULL && curr2 != NULL) {
-		add_card(merged_deck, curr1);
-		add_card(merged_deck, curr2);
-		curr1 = curr1->next;
-		curr2 = curr2->next;
+		if (curr1 != NULL) {
+				c1 = get_nth_node(deck1, current_index1++);
+				card1 = (card_t *)c1->data;
+				add_card(merged_deck, card1);
+				curr1 = curr1->next;
+		}
+		
+		if (curr2 != NULL) {
+				c2 = get_nth_node(deck2, current_index2++);
+				card2 = (card_t *)c2->data;
+				add_card(merged_deck, card2);
+				curr2 = curr2->next;
+		}
+		
 	}
 
-	while (curr1) {
-		add_card(merged_deck, curr1);
-		curr1 = curr1->next;
+	while (curr1 != NULL) {
+			c1 = get_nth_node(deck1, current_index1++);
+			card1 = (card_t *)c1->data;
+			add_card(merged_deck, card1);
+			curr1 = curr1->next;
 	}
-	while (curr2) {
-		add_card(merged_deck, curr2);
-		curr2 = curr2->next;
-	}
-	
 
-	delete_deck(list, d_index1);
+	while (curr2 != NULL) {
+			c2 = get_nth_node(deck2, current_index2++);
+			card2 = (card_t *)c2->data;
+			add_card(merged_deck, card2);
+			curr2 = curr2->next;
+	}
 	delete_deck(list, d_index2);
-	add_deck_to_list(merged_deck, list);
+	delete_deck(list, d_index1);
+	add_deck_to_list(&merged_deck, list);
 	printf(MERGE_DECKS, d_index1, d_index2);
 }
 
