@@ -369,22 +369,26 @@ void merge_decks(ll_t *list, int d_index1, int d_index2) {
 }
 
 
-void remove_nth_node(ll_t *list, int n) {
-	node_t *node = list->head;
-	while (node->next && --n > 0) {
+void remove_nth_node(ll_t **list, int n) {
+	node_t *node = (*list)->head;
+	while (node->next && n-- > 0) {
 		node = node->next;
 	}
 
 	node_t *prev = node->prev;
 	node_t *next = node->next;
 
-	prev->next = next;
-	next->prev = prev;
-
-	if (node == list->head) {
-		list->head = next;
+	if (prev != NULL) {
+		prev->next = next;
 	}
-	list->size--;
+	if (next != NULL) {
+		next->prev = prev;
+	}
+
+	if (node == (*list)->head) {
+		(*list)->head = next;
+	}
+	(*list)->size--;
 }
 
 void split_deck(ll_t *list, int d_index, int split_index) {
@@ -407,26 +411,38 @@ void split_deck(ll_t *list, int d_index, int split_index) {
 		Pachet 2: 7, 8, 9
 		Pachet 3: 12, 13, 14
 	*/
-	ll_t *l1 = list_create(sizeof(card_t));
-	ll_t *l2 = list_create(sizeof(card_t));
+	if (split_index == 0) {
+			return;
+	}
+	ll_t *new_list = list_create(sizeof(card_t));
 
 	node_t *d = get_nth_node(list, d_index);
 	ll_t *deck = *(ll_t **)d->data;
 
 	node_t *curr = deck->head;
-	int i = 0;
-	while (i != split_index) {
-		add_card(l1, curr->data);
-		i++;
+	int ind = split_index;
+	while (curr && ind-- > 0) {
+		curr = curr->next;
+}
+	
+	ind = split_index;
+	printf("%d %d\n", ind, deck->size - split_index);
+	while (ind != deck->size) {
+		node_t *split_node = get_nth_node(deck, ind);
+		card_t *split_card = (card_t *)split_node->data;
+		add_card(new_list, split_card);
+		ind++;
 	}
-
-	int j = deck->size - split_index + 1;
-
-	while (j != deck->size) {
-		add_card(l2, curr->data);
-		j++;
+	int pos = split_index;
+	while (split_index != deck->size) {
+			printf("deck size %d", deck->size);
+			printf("pos: %d\n", pos);
+			remove_nth_node(&deck, deck->size);
 	}
-
+	
+	printf("%d\n", deck->size);
+	add_deck_to_list(&new_list, list); 
+	printf("done\n");
 }
 
 void reverse_deck(ll_t *list, int deck_index) {
@@ -524,7 +540,7 @@ int main(void) {
 		} else if (strcmp(command, "MERGE_DECKS") == 0) {
 			scanf("%d %d", &i1, &i2);
 			merge_decks(my_list, i1, i2);
-		} else if (strcmp(command, "SPLIT_DECKS") == 0) {
+		} else if (strcmp(command, "SPLIT_DECK") == 0) {
 			scanf("%d %d", &i1, &i2);
 			split_deck(my_list, i1, i2);
 		} else if (strcmp(command, "REVERSE_DECK") == 0) {
