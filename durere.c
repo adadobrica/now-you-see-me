@@ -5,23 +5,9 @@
 #define STRING_SIZE 256
 #define MAX_SYMBOL_SIZE 8
 #define NUM_SYMBOLS 4
-#define DECK_INDEX_OUT_OF_BOUNDS "The provided index is out of bounds \
-												for the deck list.\n"
-#define CARD_INDEX_OUT_OF_BOUNDS "The provided index is out of bounds \
-												for deck %d.\n"
+#define DECK_INDEX_OUT_OF_BOUNDS "The provided index is out of bounds for the deck list.\n"
 #define INVALID_CARD "The provided card is not a valid one.\n"
 #define INVALID_COMMAND "Invalid command. Please try again.\n"
-#define ADDED_DECK "The deck was successfully created with %d cards.\n"
-#define DELETED_DECK "The deck %d was successfully deleted.\n"
-#define DELETED_CARD "The card was successfully deleted from deck %d.\n"
-#define ADD_CARDS "The cards were successfully added to deck %d.\n"
-#define DECK_NUMBER "The number of decks is %d.\n"													
-#define DECK_LEN "The length of deck %d is %d.\n"
-#define SHUFFLE_DECK "The deck %d was successfully shuffled.\n"													
-#define MERGE_DECKS "The deck %d and the deck %d were successfully merged.\n"
-#define SPLIT_DECK "The deck %d was successfully split by index %d.\n"
-#define REVERSE_DECK "The deck %d was successfully reversed.\n"
-#define SORT_DECK "The deck %d was successfully sorted.\n"
 
 typedef struct node_t
 {
@@ -70,18 +56,6 @@ void free_main_list(ll_t **list) {
 		current = current->next;
 	}
 	free_list(list);
-	
-	/*int index = 0;
-	while (index != (*list)->size) {
-			node_t *current = get_nth_node((*list), index);
-			ll_t *current_deck = *(ll_t **)current->data;
-			free_list(&current_deck);
-			free(current->data);
-			free(current);
-			index++;
-	}
-	free(*list);
-	*/
 }
 
 void add_card(ll_t *deck, const void *card) {
@@ -133,7 +107,7 @@ int add_deck_to_list(const void *deck, ll_t *list) {
 
 int check_valid_card(card_t *card) {
 	char sym[NUM_SYMBOLS][MAX_SYMBOL_SIZE] = {"HEART", "CLUB", "DIAMOND", "SPADE"};
-	if (card->value < 1 && card->value > 14) {
+	if (card->value < 1 || card->value > 14) {
 		return 0;
 	}
 	int valid = 0;
@@ -150,7 +124,7 @@ int check_valid_card(card_t *card) {
 
 void delete_deck(ll_t *list, int index) {
 	node_t *node = list->head;
-	if (index < 0) {
+	if (index < 0 || index > list->size) {
 		printf(DECK_INDEX_OUT_OF_BOUNDS);
 		return;
 	}
@@ -173,7 +147,6 @@ void delete_deck(ll_t *list, int index) {
 			free_list(&deleted_deck);
 			free(node->data);
 			free(node);
-			printf(DELETED_DECK, index);
 			return;
 	}
 	node_t *prev = node->prev;
@@ -186,33 +159,38 @@ void delete_deck(ll_t *list, int index) {
 	free_list(&deleted_deck);
 	free(node->data);
 	free(node);
-	printf(DELETED_DECK, index);
 }
 
 void delete_card(ll_t *list, int d_index, int c_index) {
 	node_t *d = get_nth_node(list, d_index);
 	ll_t *deck = *(ll_t **)d->data;
 	node_t *node = deck->head;
-	
-	if (deck->size == 0) {
-		delete_deck(list, d_index);
+
+	if (deck->size == 1 && c_index == deck->size) {
+		printf("The provided index is out of bounds for deck %d.\n", d_index);
 		return;
 	}
-	if (c_index < 0) {
-		printf(CARD_INDEX_OUT_OF_BOUNDS);
+	
+	if (c_index < 0 || c_index > deck->size) {
+		printf("The provided index is out of bounds for deck %d.\n", d_index);
 		return;
 	}
 	while (node->next != NULL && c_index-- > 0) {
 		node = node->next;
 	}
 	if (node == deck->head) {
-			deck->head = deck->head->next;
+			deck->head = node->next;
 			deck->size--;
 			free(node->data);
 			free(node);
-			printf(DELETED_CARD, d_index);
+			printf("The card was successfully deleted from deck %d.\n",
+															d_index);
+			if (deck->size == 0) {
+				delete_deck(list, d_index);
+			}
 			return;
 	}
+
 	node_t *prev = node->prev;
 	node_t *next = node->next;
 	prev->next = next;
@@ -222,7 +200,11 @@ void delete_card(ll_t *list, int d_index, int c_index) {
 	deck->size--;
 	free(node->data);
 	free(node);
-	printf(DELETED_CARD, d_index);
+	printf("The card was successfully deleted from deck %d.\n", d_index);
+
+	if (deck->size == 0) {
+		delete_deck(list, d_index);
+	}
 }
 
 void add_cards(ll_t *list, int index, int num) {
@@ -244,13 +226,13 @@ void add_cards(ll_t *list, int index, int num) {
 		add_card(*(ll_t **)current_deck->data, &new_card);
 		nr++;
 	}
-	printf(ADD_CARDS, index);
+	printf("The cards were successfully added to deck %d.\n", index);
 
 }
 
 void get_deck_number(ll_t *list) {
 	int num = list->size;
-	printf(DECK_NUMBER, num);
+	printf("The number of decks is %d.\n", num);
 }
 
 node_t* get_nth_node(ll_t *list, int n) {
@@ -264,14 +246,15 @@ node_t* get_nth_node(ll_t *list, int n) {
 void get_deck_len(ll_t *list, int deck_index) {
 	node_t *current_deck = get_nth_node(list, deck_index);
 	int index = deck_index;
-	while (current_deck->next != NULL && --index > 0) {
+	/*while (current_deck->next != NULL && index > 0) {
 		current_deck = current_deck->next;
+		--index;
 	}
-
+*/
 	ll_t *deck;
 	deck = *(ll_t **)current_deck->data;
 	int length = deck->size;
-	printf(DECK_LEN, deck_index, length);
+	printf("The length of deck %d is %d.\n", deck_index, length);
 
 }
 
@@ -281,7 +264,7 @@ void shuffle_deck(ll_t *list, int deck_index) {
 	ll_t *deck = *(ll_t **)d->data;
 	int	d_size = deck->size / 2;
 	if (deck->size == 1) {
-			printf(SHUFFLE_DECK, deck_index);
+			printf("The deck %d was successfully shuffled.\n", deck_index);
 			return;
 	}
 	node_t *head = deck->head;
@@ -295,7 +278,7 @@ void shuffle_deck(ll_t *list, int deck_index) {
 	head->prev = tail;
 	tail->next = head;
 	deck->head = tmp;
-	printf(SHUFFLE_DECK, deck_index);
+	printf("The deck %d was successfully shuffled.\n", deck_index);
 }
 
 void add_nth_node(ll_t *list, int n, const void *card) {
@@ -362,10 +345,17 @@ void merge_decks(ll_t *list, int d_index1, int d_index2) {
 			add_card(merged_deck, card2);
 			curr2 = curr2->next;
 	}
-	delete_deck(list, d_index2);
-	delete_deck(list, d_index1);
+
+	if (d_index1 > d_index2) {
+		delete_deck(list, d_index1);
+		delete_deck(list, d_index2);
+	} else {
+		delete_deck(list, d_index2);
+		delete_deck(list, d_index1);
+	}
 	add_deck_to_list(&merged_deck, list);
-	printf(MERGE_DECKS, d_index1, d_index2);
+	printf("The deck %d and the deck %d were successfully merged.\n",
+												d_index1, d_index2);
 }
 
 
@@ -389,35 +379,47 @@ void remove_nth_node(ll_t **list, int n) {
 		(*list)->head = next;
 	}
 	(*list)->size--;
+	free(node->data);
+	free(node);
 }
 
-void split_deck(ll_t *list, int d_index, int split_index) {
-	/* 
-	- imparte pachetul d_index dupa indexul split_index
-	- primul pachet rezultat va ramane la d_index, iar al
-	doilea pachet rezultat se va insera la pozitia d_index + 1
-	- daca in urma comenzii rezulta un pachet gol si un pachet
-	ce contine toate cartile (split_index == 0), se va pastra doar
-	pachetul ce contine carti
-
-	ex: 
-	pachet 0: 1, 2, 3, 4
-	pachet 1: 7, 8, 9
-	pachet 2: 12, 13, 14
-	SPLIT_DECK 0 2
-	Rezultate:
-		Pachet 1a: 1, 2
-		Pachet 1b: 3, 4
-		Pachet 2: 7, 8, 9
-		Pachet 3: 12, 13, 14
-	*/
-	if (split_index == 0) {
-			return;
+void add_nth_deck(ll_t *list, int n, const void *deck) {
+	node_t *prev, *curr, *new_node;
+	curr = list->head;
+	prev = NULL;
+	while (n > 0) {
+		prev = curr;
+		curr = curr->next;
+		--n;
 	}
+	new_node = malloc(sizeof(node_t));
+	new_node->data = malloc(sizeof(ll_t));
+	memcpy(new_node->data, deck, sizeof(ll_t));
+
+	new_node->next = curr;
+	if (prev == NULL) {
+			list->head = new_node;
+	} else {
+			prev->next = new_node;
+	}
+	list->size++;
+}
+void split_deck(ll_t *list, int d_index, int split_index) {
+	if (split_index == 0) {
+		printf("The deck %d was successfully split by index %d.\n",
+											d_index, split_index);	
+		return;
+	}
+	
+	if (split_index > list->size) {
+		printf(DECK_INDEX_OUT_OF_BOUNDS);
+		return;
+	}
+
 	ll_t *new_list = list_create(sizeof(card_t));
 
 	node_t *d = get_nth_node(list, d_index);
-	ll_t *deck = *(ll_t **)d->data;
+	ll_t *deck = *(ll_t **)d->data; 
 
 	node_t *curr = deck->head;
 	int ind = split_index;
@@ -426,7 +428,6 @@ void split_deck(ll_t *list, int d_index, int split_index) {
 }
 	
 	ind = split_index;
-	printf("%d %d\n", ind, deck->size - split_index);
 	while (ind != deck->size) {
 		node_t *split_node = get_nth_node(deck, ind);
 		card_t *split_card = (card_t *)split_node->data;
@@ -435,14 +436,12 @@ void split_deck(ll_t *list, int d_index, int split_index) {
 	}
 	int pos = split_index;
 	while (split_index != deck->size) {
-			printf("deck size %d", deck->size);
-			printf("pos: %d\n", pos);
 			remove_nth_node(&deck, deck->size);
 	}
 	
-	printf("%d\n", deck->size);
-	add_deck_to_list(&new_list, list); 
-	printf("done\n");
+	add_nth_node(list, d_index + 1, &new_list);
+	printf("The deck %d was successfully split by index %d.\n",
+										d_index, split_index);
 }
 
 void reverse_deck(ll_t *list, int deck_index) {
@@ -461,7 +460,7 @@ void reverse_deck(ll_t *list, int deck_index) {
 	if (tmp != NULL) {
 		deck->head = tmp->prev;
 	}
-	printf(REVERSE_DECK, deck_index);
+	printf("The deck %d was successfully reversed.\n", deck_index);
 }
 
 void show_deck(ll_t *deck, int deck_index) {
@@ -504,18 +503,19 @@ int main(void) {
 				if (check_valid_card(&deck_card) == 0) {
 					printf(INVALID_CARD);
 					continue;
-				}
+				}	
 				add_card(deck, &deck_card);
 				num++; 
 			}
 			check = add_deck_to_list(&deck, my_list);
 			if (check == 1) {
-				printf(ADDED_DECK, num_cards);
+				printf("The deck was successfully created with %d cards.\n",
+															num_cards);
 			}
-
 		} else if (strcmp(command, "DEL_DECK") == 0) {
 			scanf("%d", &deck_index);
 			delete_deck(my_list, deck_index);
+			printf("The deck %d was successfully deleted.\n", deck_index);
 		} else if (strcmp(command, "DEL_CARD") == 0) {
 			scanf("%d %d", &deck_index, &card_index);
 			delete_card(my_list, deck_index, card_index);
@@ -558,6 +558,8 @@ int main(void) {
 			break;
 		} else {
 			printf(INVALID_COMMAND);
+			char garbage[100];
+			fgets(garbage, 99, stdin);
 		}
 	}
 	return 0;
