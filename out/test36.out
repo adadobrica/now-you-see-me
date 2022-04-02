@@ -730,25 +730,6 @@ Deck 3:
 	10 HEART
 The card was successfully deleted from deck 1.
 The provided index is out of bounds for the deck list.
-Deck 0:
-	12 CLUB
-	2 HEART
-	3 CLUB
-	14 HEART
-	10 SPADE
-Deck 1:
-	7 HEART
-	11 SPADE
-	5 HEART
-	1 SPADE
-Deck 2:
-	10 DIAMOND
-	8 CLUB
-Deck 3:
-	4 DIAMOND
-	7 DIAMOND
-	10 CLUB
-	10 HEART
 Invalid command. Please try again.
 Deck 1:
 	7 HEART
