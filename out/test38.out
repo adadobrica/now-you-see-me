@@ -2502,9 +2502,10 @@ Deck 12:
 	14 SPADE
 	14 DIAMOND
 The provided index is out of bounds for the deck list.
-The provided card is not a valid one.
-The provided card is not a valid one.
-The cards were successfully added to deck 13.
+The provided index is out of bounds for the deck list.
+Invalid command. Please try again.
+Invalid command. Please try again.
+Invalid command. Please try again.
 Deck 2:
 	5 CLUB
 	6 SPADE
@@ -2603,7 +2604,6 @@ Deck 12:
 	13 CLUB
 	14 SPADE
 	14 DIAMOND
-	14 HEART
 The provided card is not a valid one.
 The cards were successfully added to deck 2.
 The provided index is out of bounds for the deck list.
@@ -2705,7 +2705,6 @@ Deck 12:
 	13 CLUB
 	14 SPADE
 	14 DIAMOND
-	14 HEART
 Deck 13:
 	4 DIAMOND
 	1 DIAMOND
@@ -2806,7 +2805,6 @@ Deck 12:
 	13 CLUB
 	14 SPADE
 	14 DIAMOND
-	14 HEART
 Deck 13:
 	4 DIAMOND
 	1 DIAMOND
