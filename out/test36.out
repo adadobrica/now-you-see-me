@@ -686,7 +686,6 @@ Deck 1:
 	5 HEART
 	1 SPADE
 The provided index is out of bounds for the deck list.
-The deck 68 was successfully deleted.
 Deck 3:
 	4 DIAMOND
 	12 DIAMOND
@@ -731,7 +730,6 @@ Deck 3:
 	10 HEART
 The card was successfully deleted from deck 1.
 The provided index is out of bounds for the deck list.
-The deck 50 was successfully deleted.
 Deck 0:
 	12 CLUB
 	2 HEART
@@ -1427,7 +1425,6 @@ Deck 6:
 	11 DIAMOND
 	1 SPADE
 The provided index is out of bounds for the deck list.
-The deck 41 was successfully deleted.
 The length of deck 4 is 7.
 Deck 0:
 	10 DIAMOND
