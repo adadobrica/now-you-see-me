@@ -296,9 +296,20 @@ void add_nth_node(ll_t *list, int n, const void *card) {
 
 	new_node->next = curr;
 	if (prev == NULL) {
-			list->head = new_node;
+        
+        //fane
+        new_node->next = list->head;
+        new_node->prev = NULL;
+		//fane
+        list->head = new_node;
 	} else {
-			prev->next = new_node;
+        //fane
+        new_node->next = curr;
+        new_node->prev = prev;
+        if (curr != NULL)
+            curr->prev = new_node;
+        //fane
+		prev->next = new_node;
 	}
 	list->size++;
 }
@@ -411,7 +422,7 @@ void split_deck(ll_t *list, int d_index, int split_index) {
 		return;
 	}
 	
-	if (split_index > list->size) {
+	if (d_index >= list->size) {
 		printf(DECK_INDEX_OUT_OF_BOUNDS);
 		return;
 	}
@@ -425,7 +436,7 @@ void split_deck(ll_t *list, int d_index, int split_index) {
 	int ind = split_index;
 	while (curr && ind-- > 0) {
 		curr = curr->next;
-}
+    }
 	
 	ind = split_index;
 	while (ind != deck->size) {
@@ -451,15 +462,16 @@ void reverse_deck(ll_t *list, int deck_index) {
 	node_t *tmp = NULL;
 	node_t *curr = deck->head;
 
-	while (curr != NULL) {
-		tmp = curr->prev;
-		curr->prev = curr->next;
-		curr->next = tmp;
-		curr = curr->prev;
-	}
-	if (tmp != NULL) {
-		deck->head = tmp->prev;
-	}
+    while (curr != NULL) {
+        
+        curr->prev = curr->next;
+        curr->next = tmp;
+        tmp = curr;
+        curr = curr->prev;
+    }
+
+    deck->head = tmp;
+
 	printf("The deck %d was successfully reversed.\n", deck_index);
 }
 
