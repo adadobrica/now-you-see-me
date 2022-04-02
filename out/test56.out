@@ -947,7 +947,7 @@ Deck 3:
 	13 SPADE
 	5 HEART
 	14 DIAMOND
-The provided index is out of bounds for the deck list.
+The provided index is out of bounds for deck 3.
 Deck 0:
 	7 SPADE
 	1 DIAMOND
@@ -1253,7 +1253,7 @@ Deck 4:
 The provided index is out of bounds for the deck list.
 Deck 2:
 	13 SPADE
-The provided index is out of bounds for the deck list.
+The provided index is out of bounds for deck -18.
 The deck was successfully created with 2 cards.
 The deck 4 and the deck 3 were successfully merged.
 Deck 0:
