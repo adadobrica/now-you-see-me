@@ -1,3 +1,4 @@
+// Copyright 2022 Dobrica Nicoleta Adriana
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -225,31 +226,36 @@ void add_cards(ll_t *list, int index, int num) {
 	}
 
 	int nr = 0;
-	char card[STRING_SIZE], *v, *sym;
+	char card[100], *v, *sym;
 	card_t new_card;
-	printf("%d\n", nr);
 	while (nr != num) {
-		fgets(card, STRING_SIZE, stdin);
-		int card_val, card_sym;
-		v = strtok(card, " ");
-		printf("%s\n", v);
-		sym = strtok(NULL, "\n"); 
-		printf("%s\n", sym);
-		if (strlen(v) != 1) {
-			printf(INVALID_CARD);
-			continue;
-		} 
-		new_card.value = atoi(v);
-		strcpy(new_card.symbol, sym);
-		printf("%d %s\n", new_card.value, new_card.symbol);
-		//scanf("%d %s", &new_card.value, new_card.symbol);
+		/*
+		scanf("%d %s", &new_card.value, new_card.symbol);
 		int ok = check_valid_card(&new_card);
 		if (ok == 0) {
 			printf(INVALID_CARD);
+			fgets(garbage, 99, stdin);
 			continue;
 		}
 		add_card(*(ll_t **)current_deck->data, &new_card);
 		nr++;
+		*/
+		fgets(card, STRING_SIZE, stdin);
+		v = strtok(card, " ");
+		sym = strtok(NULL, "\n");
+		int len = strlen(v);
+		if (len <= 3) {
+			int card_val = atoi(v);
+			new_card.value = card_val;
+			strcpy(new_card.symbol, sym);
+			int ok = check_valid_card(&new_card);
+			if (ok == 0) {
+				printf(INVALID_CARD);
+				continue;
+			}
+			add_card(*(ll_t **)current_deck->data, &new_card);
+			nr++;
+		}
 	}
 	printf("The cards were successfully added to deck %d.\n", index);
 
@@ -542,6 +548,49 @@ void show_all(ll_t *list) {
 	}
 }
 
+void sort_deck(ll_t *list, int deck_index) {
+	if (deck_index < 0 || deck_index >= list->size) {
+		printf(DECK_INDEX_OUT_OF_BOUNDS);
+		return;
+	}
+	node_t *d = get_nth_node(list, deck_index);
+	ll_t *deck = *(ll_t **)d->data;
+	node_t *curr = NULL, *next_c = NULL;
+	void *temp;
+	for (curr = deck->head; curr->next != NULL; curr = curr->next) {
+		for (next_c = curr->next; next_c != NULL; next_c = next_c->next) {
+			card_t *card1, *card2;
+			card1 = (card_t *)curr->data;
+			card2 = (card_t *)next_c->data;
+			if (card1->value > card2->value) {
+				temp = curr->data;
+				curr->data = next_c->data;
+				next_c->data = temp;
+			} else if (card1->value == card2->value) {
+				if (strcmp(card1->symbol, "HEART") != 0 && strcmp(card2->symbol, "HEART") == 0) {
+						temp = curr->data;
+						curr->data = next_c->data;
+						next_c->data = temp;
+				} else if (strcmp(card1->symbol, "HEART") != 0 && strcmp(card2->symbol, "SPADE") == 0) {
+						temp = curr->data;
+						curr->data = next_c->data;
+						next_c->data = temp;
+				} else if (strcmp(card1->symbol, "HEART") != 0 && strcmp(card2->symbol, "DIAMOND") == 0 && strcmp(card1->symbol, "SPADE") != 0) {
+						temp = curr->data;
+						curr->data = next_c->data;
+						next_c->data = temp;
+				} else if (strcmp(card1->symbol, "HEART") != 0 && strcmp(card2->symbol, "CLUB") == 0 && strcmp(card1->symbol, "SPADE") != 0 && strcmp(card1->symbol, "DIAMOND") != 0) {
+						temp = curr->data;
+						curr->data = next_c->data;
+						next_c->data = temp;
+				}
+			}
+			
+		}
+	}
+	printf("The deck %d was successfully sorted.\n", deck_index);
+}
+
 int main(void) {
 	ll_t *my_list = list_create(sizeof(ll_t *));
 	ll_t *deck;
@@ -564,7 +613,7 @@ int main(void) {
 						continue;
 					}	
 					add_card(deck, &deck_card);
-					num++; 
+					num++;
 				}
 				check = add_deck_to_list(&deck, my_list);
 				if (check == 1) {
@@ -687,7 +736,11 @@ int main(void) {
 			scanf("%d", &deck_index);
 			fgets(garbage, 99, stdin);
 			len = strlen(garbage);
-			printf(INVALID_COMMAND);
+			if (len == 1) {
+				sort_deck(my_list, deck_index);
+			} else {
+				printf(INVALID_COMMAND);
+			}
 		} else {
 			printf(INVALID_COMMAND);
 			fgets(garbage, 99, stdin);
