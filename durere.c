@@ -247,9 +247,11 @@ void add_cards(ll_t *list, int index, int num) {
 			if (ok == 0) {
 				printf(INVALID_CARD);
 				continue;
-			}
+			} 
 			add_card(*(ll_t **)current_deck->data, &new_card);
 			nr++;
+		} else {
+			printf(INVALID_CARD);
 		}
 	}
 	printf("The cards were successfully added to deck %d.\n", index);
