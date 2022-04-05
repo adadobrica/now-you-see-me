@@ -6,7 +6,6 @@
 #define STRING_SIZE 256
 #define MAX_SYMBOL_SIZE 8
 #define NUM_SYMBOLS 4
-#define DECK_INDEX_OUT_OF_BOUNDS "The provided index is out of bounds for the deck list.\n"
 #define INVALID_CARD "The provided card is not a valid one.\n"
 #define INVALID_COMMAND "Invalid command. Please try again.\n"
 
@@ -65,7 +64,6 @@ void add_card(ll_t *deck, const void *card) {
 	memcpy(new_node->data, card, deck->data_size);
 	new_node->next = NULL;
 	new_node->prev = NULL;
-	
 	if (deck->size == 0) {
 		deck->head = new_node;
 		deck->size++;
@@ -103,11 +101,11 @@ int add_deck_to_list(const void *deck, ll_t *list) {
 	new_node->prev = node;
 	list->size++;
 	return 1;
-	
 }
 
 int check_valid_card(card_t *card) {
-	char sym[NUM_SYMBOLS][MAX_SYMBOL_SIZE] = {"HEART", "CLUB", "DIAMOND", "SPADE"};
+	char sym[NUM_SYMBOLS][MAX_SYMBOL_SIZE] = {"HEART", "CLUB", "DIAMOND",
+												"SPADE"};
 	if (card->value < 1 || card->value > 14) {
 		return 0;
 	}
@@ -126,7 +124,7 @@ int check_valid_card(card_t *card) {
 int delete_deck(ll_t *list, int index) {
 	node_t *node = list->head;
 	if (index < 0 || index >= list->size) {
-		printf(DECK_INDEX_OUT_OF_BOUNDS);
+		printf("The provided index is out of bounds for the deck list.\n");
 		return -1;
 	}
 	/*
@@ -161,14 +159,12 @@ int delete_deck(ll_t *list, int index) {
 	free(node->data);
 	free(node);
 	return 1;
-	
 }
 
-void delete_card(ll_t *list, int d_index, int c_index) {	
+void delete_card(ll_t *list, int d_index, int c_index) {
 	if (d_index >= list->size || d_index < 0) {
-		printf(DECK_INDEX_OUT_OF_BOUNDS);
+		printf("The provided index is out of bounds for the deck list.\n");
 		return;
-	
 	}
 	node_t *d = get_nth_node(list, d_index);
 	ll_t *deck = *(ll_t **)d->data;
@@ -177,7 +173,6 @@ void delete_card(ll_t *list, int d_index, int c_index) {
 		printf("The provided index is out of bounds for deck %d.\n", d_index);
 		return;
 	}
-	
 	if (c_index < 0 || c_index >= deck->size) {
 		printf("The provided index is out of bounds for deck %d.\n", d_index);
 		return;
@@ -218,7 +213,7 @@ void add_cards(ll_t *list, int index, int num) {
 	node_t *current_deck = list->head;
 	int ind = index;
 	if (index < 0 || index >= list->size) {
-		printf(DECK_INDEX_OUT_OF_BOUNDS);
+		printf("The provided index is out of bounds for the deck list.\n");
 		return;
 	}
 	while (current_deck->next != NULL && ind-- > 0) {
@@ -258,7 +253,6 @@ void add_cards(ll_t *list, int index, int num) {
 		}
 	}
 	printf("The cards were successfully added to deck %d.\n", index);
-
 }
 
 void get_deck_number(ll_t *list) {
@@ -276,7 +270,7 @@ node_t* get_nth_node(ll_t *list, int n) {
 
 void get_deck_len(ll_t *list, int deck_index) {
 	if (deck_index < 0 || deck_index >= list->size) {
-		printf(DECK_INDEX_OUT_OF_BOUNDS);
+		printf("The provided index is out of bounds for the deck list.\n");
 		return;
 	}
 	node_t *current_deck = get_nth_node(list, deck_index);
@@ -290,13 +284,12 @@ void get_deck_len(ll_t *list, int deck_index) {
 	deck = *(ll_t **)current_deck->data;
 	int length = deck->size;
 	printf("The length of deck %d is %d.\n", deck_index, length);
-
 }
 
 
 void shuffle_deck(ll_t *list, int deck_index) {
 	if (deck_index >= list->size || deck_index < 0) {
-		printf(DECK_INDEX_OUT_OF_BOUNDS);
+		printf("The provided index is out of bounds for the deck list.\n");
 		return;
 	}
 	node_t *d = get_nth_node(list, deck_index);
@@ -335,7 +328,6 @@ void add_nth_node(ll_t *list, int n, const void *card) {
 
 	new_node->next = curr;
 	if (prev == NULL) {
-        
         new_node->next = list->head;
         new_node->prev = NULL;
         list->head = new_node;
@@ -352,7 +344,7 @@ void add_nth_node(ll_t *list, int n, const void *card) {
 void merge_decks(ll_t *list, int d_index1, int d_index2) {
 	if (d_index1 < 0 || d_index1 >= list->size || d_index2 < 0 ||
 										d_index2 >= list->size) {
-		printf(DECK_INDEX_OUT_OF_BOUNDS);
+		printf("The provided index is out of bounds for the deck list.\n");
 		return;
 	}
 	node_t *d1 = get_nth_node(list, d_index1);
@@ -373,14 +365,12 @@ void merge_decks(ll_t *list, int d_index1, int d_index2) {
 				add_card(merged_deck, card1);
 				curr1 = curr1->next;
 		}
-		
 		if (curr2 != NULL) {
 				c2 = get_nth_node(deck2, current_index2++);
 				card2 = (card_t *)c2->data;
 				add_card(merged_deck, card2);
 				curr2 = curr2->next;
 		}
-		
 	}
 
 	while (curr1 != NULL) {
@@ -456,16 +446,14 @@ void add_nth_deck(ll_t *list, int n, const void *deck) {
 	list->size++;
 }
 void split_deck(ll_t *list, int d_index, int split_index) {
-	
 	if (d_index >= list->size || d_index < 0) {
-		printf(DECK_INDEX_OUT_OF_BOUNDS);
+		printf("The provided index is out of bounds for the deck list.\n");
 		return;
 	}
-	
 
 	if (split_index == 0) {
 		printf("The deck %d was successfully split by index %d.\n",
-											d_index, split_index);	
+											d_index, split_index);
 		return;
 	}
 
@@ -483,7 +471,6 @@ void split_deck(ll_t *list, int d_index, int split_index) {
 	while (curr && ind-- > 0) {
 		curr = curr->next;
     }
-	
 	ind = split_index;
 	while (ind != deck->size) {
 		node_t *split_node = get_nth_node(deck, ind);
@@ -495,7 +482,6 @@ void split_deck(ll_t *list, int d_index, int split_index) {
 	while (split_index != deck->size) {
 			remove_nth_node(&deck, deck->size);
 	}
-	
 	add_nth_node(list, d_index + 1, &new_list);
 	printf("The deck %d was successfully split by index %d.\n",
 										d_index, split_index);
@@ -503,7 +489,7 @@ void split_deck(ll_t *list, int d_index, int split_index) {
 
 void reverse_deck(ll_t *list, int deck_index) {
 	if (deck_index < 0 || deck_index >= list->size) {
-		printf(DECK_INDEX_OUT_OF_BOUNDS);
+		printf("The provided index is out of bounds for the deck list.\n");
 		return;
 	}
 	node_t *d = get_nth_node(list, deck_index);
@@ -513,7 +499,6 @@ void reverse_deck(ll_t *list, int deck_index) {
 	node_t *curr = deck->head;
 
     while (curr != NULL) {
-        
         curr->prev = curr->next;
         curr->next = tmp;
         tmp = curr;
@@ -541,7 +526,7 @@ void show_all(ll_t *list) {
 	ll_t *deck;
 	int index = 0;
 	while (curr) {
-		deck = *(ll_t **)curr->data;	
+		deck = *(ll_t **)curr->data;
 		show_deck(deck, index);
 		curr = curr->next;
 		index++;
@@ -550,7 +535,7 @@ void show_all(ll_t *list) {
 
 void sort_deck(ll_t *list, int deck_index) {
 	if (deck_index < 0 || deck_index >= list->size) {
-		printf(DECK_INDEX_OUT_OF_BOUNDS);
+		printf("The provided index is out of bounds for the deck list.\n");
 		return;
 	}
 	node_t *d = get_nth_node(list, deck_index);
@@ -567,25 +552,31 @@ void sort_deck(ll_t *list, int deck_index) {
 				curr->data = next_c->data;
 				next_c->data = temp;
 			} else if (card1->value == card2->value) {
-				if (strcmp(card1->symbol, "HEART") != 0 && strcmp(card2->symbol, "HEART") == 0) {
+				if (strcmp(card1->symbol, "HEART") != 0 &&
+					strcmp(card2->symbol, "HEART") == 0) {
 						temp = curr->data;
 						curr->data = next_c->data;
 						next_c->data = temp;
-				} else if (strcmp(card1->symbol, "HEART") != 0 && strcmp(card2->symbol, "SPADE") == 0) {
+				} else if (strcmp(card1->symbol, "HEART") != 0 &&
+							strcmp(card2->symbol, "SPADE") == 0) {
 						temp = curr->data;
 						curr->data = next_c->data;
 						next_c->data = temp;
-				} else if (strcmp(card1->symbol, "HEART") != 0 && strcmp(card2->symbol, "DIAMOND") == 0 && strcmp(card1->symbol, "SPADE") != 0) {
+				} else if (strcmp(card1->symbol, "HEART") != 0 &&
+							strcmp(card2->symbol, "DIAMOND") == 0 &&
+							strcmp(card1->symbol, "SPADE") != 0) {
 						temp = curr->data;
 						curr->data = next_c->data;
 						next_c->data = temp;
-				} else if (strcmp(card1->symbol, "HEART") != 0 && strcmp(card2->symbol, "CLUB") == 0 && strcmp(card1->symbol, "SPADE") != 0 && strcmp(card1->symbol, "DIAMOND") != 0) {
+				} else if (strcmp(card1->symbol, "HEART") != 0 &&
+							strcmp(card2->symbol, "CLUB") == 0 &&
+							strcmp(card1->symbol, "SPADE") != 0 &&
+							strcmp(card1->symbol, "DIAMOND") != 0) {
 						temp = curr->data;
 						curr->data = next_c->data;
 						next_c->data = temp;
 				}
 			}
-			
 		}
 	}
 	printf("The deck %d was successfully sorted.\n", deck_index);
@@ -611,7 +602,7 @@ int main(void) {
 					if (check_valid_card(&deck_card) == 0) {
 						printf(INVALID_CARD);
 						continue;
-					}	
+					}
 					add_card(deck, &deck_card);
 					num++;
 				}
@@ -712,7 +703,7 @@ int main(void) {
 			len = strlen(garbage);
 			if (len == 1) {
 				if (deck_index < 0 || deck_index >= my_list->size) {
-					printf(DECK_INDEX_OUT_OF_BOUNDS);
+					printf("The provided index is out of bounds for the deck list.\n");
 				} else {
 	        		node_t *d = get_nth_node(my_list, deck_index);
 					ll_t *s_deck = *(ll_t **)d->data;
