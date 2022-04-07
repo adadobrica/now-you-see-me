@@ -1,5 +1,6 @@
-#ifndef _STRUCT_H_
-#define _STRUCT_H_
+// Copyright 2022 Dobrica Nicoleta Adriana
+#ifndef STRUCT_H_
+#define STRUCT_H_
 
 #include <stdio.h>
 #include <string.h>
@@ -25,4 +26,4 @@ typedef struct card_t
 	char symbol[MAX_SYMBOL_SIZE];
 } card_t;
 
-#endif  //  _STRUCT_H_
+#endif  //  STRUCT_H_

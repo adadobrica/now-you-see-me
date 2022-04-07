@@ -5,7 +5,7 @@ TARGETS=NowYouSeeMe
 build:	$(TARGETS)
 
 NowYouSeeMe: struct.h utils.h
-	$(CC) NowYouSeeMe.c -o NowYouSeeMe utils.c $(CFLAGS)
+	$(CC) NowYouSeeMe.c -o tema1 utils.c $(CFLAGS)
 
 clean:
 	rm -f $(TARGETS)

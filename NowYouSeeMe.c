@@ -15,7 +15,7 @@
 int main(void) {
 	ll_t *my_list = list_create(sizeof(ll_t *));
 	char command[STRING_SIZE], garb[LINE_MAX];
-	int num_cards, deck_index, card_index, i1, i2;
+	int num_cards;
 	while (1) {
 		scanf("%s", command);
 		if (strcmp(command, "ADD_DECK") == 0) {

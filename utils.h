@@ -1,5 +1,6 @@
-#ifndef _UTILS_H_
-#define _UTILS_H_
+// Copyright 2022 Dobrica Nicoleta Adriana
+#ifndef UTILS_H_
+#define UTILS_H_
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -51,4 +52,4 @@ void SHOW_DECK_COMMAND(ll_t **my_list);
 void SHOW_ALL_COMMAND(ll_t **my_list);
 void SORT_DECK_COMMAND(ll_t **my_list);
 
-#endif  //  __UTILS_H_
+#endif  //  UTILS_H_

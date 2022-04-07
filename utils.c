@@ -1,3 +1,4 @@
+// Copyright 2022 Dobrica Nicoleta Adriana
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,6 +11,8 @@
 #define INVALID_CARD "The provided card is not a valid one.\n"
 #define INVALID_COMMAND "Invalid command. Please try again.\n"
 
+// function to create a list
+
 ll_t* list_create(int data_size) {
 	ll_t *list = malloc(sizeof(ll_t));
 	list->data_size = data_size;
@@ -17,7 +20,11 @@ ll_t* list_create(int data_size) {
 	list->head = NULL;
 	return list;
 }
+
+// this function is used to free the decks from memory
+
 void free_list(ll_t **list) {
+	// iterating through my list and freeing each node
 	node_t *aux = (*list)->head;
 	while (aux) {
 		node_t *next = aux->next;
@@ -28,7 +35,10 @@ void free_list(ll_t **list) {
 	free(*list);
 	*list = NULL;
 }
+
 node_t* get_nth_node(ll_t *list, int n);
+
+// this function is for freeing the list of decks
 
 void free_main_list(ll_t **list) {
 	node_t *current = (*list)->head;
@@ -42,6 +52,7 @@ void free_main_list(ll_t **list) {
 }
 
 void add_card(ll_t *deck, const void *card) {
+	// allocating memory for the new node
 	node_t *new_node = malloc(sizeof(node_t));
 	new_node->data = malloc(deck->data_size);
 	memcpy(new_node->data, card, deck->data_size);
@@ -61,6 +72,8 @@ void add_card(ll_t *deck, const void *card) {
 	new_node->prev = node;
 	deck->size++;
 }
+
+// this is similar to add_card function
 
 int add_deck_to_list(const void *deck, ll_t *list) {
 	node_t *new_node = malloc(sizeof(node_t));
@@ -87,6 +100,7 @@ int add_deck_to_list(const void *deck, ll_t *list) {
 }
 
 int check_valid_card(card_t *card) {
+	// checking whether a given card is valid or not
 	char sym[NUM_SYMBOLS][MAX_SYMBOL_SIZE] = {"HEART", "CLUB", "DIAMOND",
 												"SPADE"};
 	if (card->value < 1 || card->value > 14) {
@@ -106,14 +120,23 @@ int check_valid_card(card_t *card) {
 
 int delete_deck(ll_t *list, int index) {
 	node_t *node = list->head;
+
+	// checking whether the index is valid
+
 	if (index < 0 || index >= list->size) {
 		printf("The provided index is out of bounds for the deck list.\n");
 		return -1;
 	}
+
+	// traversing the list until I find the desired deck
+
 	int ind = index;
 	while (node->next != NULL && ind-- > 0) {
 		node = node->next;
 	}
+
+	// deleting the deck
+
 	node_t *deleted_node = get_nth_node(list, index);
 	ll_t *deleted_deck = *(ll_t **)deleted_node->data;
 	if (node == list->head) {
@@ -185,6 +208,8 @@ void delete_card(ll_t *list, int d_index, int c_index) {
 	}
 }
 
+// adding new cards to an already existing deck
+
 void add_cards(ll_t *list, int index, int num) {
 	node_t *current_deck = list->head;
 	int ind = index;
@@ -203,6 +228,8 @@ void add_cards(ll_t *list, int index, int num) {
 		fgets(card, STRING_SIZE, stdin);
 		v = strtok(card, " ");
 		sym = strtok(NULL, "\n");
+		// if the length of the value is not lesser than 3, then that means
+		// the new "card" is not valid and should be ignored
 		int len = strlen(v);
 		if (len <= 3) {
 			int card_val = atoi(v);
@@ -240,6 +267,9 @@ void get_deck_len(ll_t *list, int deck_index) {
 		printf("The provided index is out of bounds for the deck list.\n");
 		return;
 	}
+
+	// finding the deck we need for printing its size
+
 	node_t *current_deck = get_nth_node(list, deck_index);
 	ll_t *deck;
 	deck = *(ll_t **)current_deck->data;
@@ -253,6 +283,9 @@ void shuffle_deck(ll_t *list, int deck_index) {
 		printf("The provided index is out of bounds for the deck list.\n");
 		return;
 	}
+
+	// finding the deck we want to shuffle
+
 	node_t *d = get_nth_node(list, deck_index);
 	ll_t *deck = *(ll_t **)d->data;
 	int	d_size = deck->size / 2;
@@ -260,6 +293,10 @@ void shuffle_deck(ll_t *list, int deck_index) {
 			printf("The deck %d was successfully shuffled.\n", deck_index);
 			return;
 	}
+
+	// instead of reversing the halves of the deck, I chose to change the
+	// pointers of the list
+
 	node_t *head = deck->head;
 	node_t *tmp = get_nth_node(deck, d_size);
 	node_t *tail = deck->head;
@@ -308,10 +345,15 @@ void merge_decks(ll_t *list, int d_index1, int d_index2) {
 		printf("The provided index is out of bounds for the deck list.\n");
 		return;
 	}
+
+	// finding the two decks that are about to be shuffled
+
 	node_t *d1 = get_nth_node(list, d_index1);
 	node_t *d2 = get_nth_node(list, d_index2);
 	ll_t *deck1 = *(ll_t **)d1->data;
 	ll_t *deck2 = *(ll_t **)d2->data;
+
+	// creating a new deck which will contain the cards from the two decks
 
 	ll_t *merged_deck = list_create(sizeof(card_t));
 
@@ -319,6 +361,10 @@ void merge_decks(ll_t *list, int d_index1, int d_index2) {
 	int current_index1 = 0, current_index2 = 0;
 	node_t *c1, *c2;
 	card_t *card1, *card2;
+
+	// the actual "merging" is being done by adding a card from each deck,
+	// one by one, by traversing the two decks
+
 	while (curr1 != NULL && curr2 != NULL) {
 		if (curr1 != NULL) {
 				c1 = get_nth_node(deck1, current_index1++);
@@ -347,6 +393,9 @@ void merge_decks(ll_t *list, int d_index1, int d_index2) {
 			add_card(merged_deck, card2);
 			curr2 = curr2->next;
 	}
+
+	// after the merging is done, the two decks are deleted from the list of
+	// decks and the new merged deck is added
 
 	if (d_index1 > d_index2) {
 		delete_deck(list, d_index1);
@@ -426,6 +475,8 @@ void split_deck(ll_t *list, int d_index, int split_index) {
 		return;
 	}
 
+	// creating a new list for the split deck
+
 	ll_t *new_list = list_create(sizeof(card_t));
 	node_t *curr = deck->head;
 	int ind = split_index;
@@ -433,12 +484,19 @@ void split_deck(ll_t *list, int d_index, int split_index) {
 		curr = curr->next;
     }
 	ind = split_index;
+
+	// adding the cards to the split deck from the main deck
+
 	while (ind != deck->size) {
 		node_t *split_node = get_nth_node(deck, ind);
 		card_t *split_card = (card_t *)split_node->data;
 		add_card(new_list, split_card);
 		ind++;
 	}
+
+	// deleting the added cards from the main deck and then adding the
+	// new deck to the position immediately after the initial deck
+
 	while (split_index != deck->size) {
 			remove_nth_node(&deck, deck->size);
 	}
@@ -452,11 +510,16 @@ void reverse_deck(ll_t *list, int deck_index) {
 		printf("The provided index is out of bounds for the deck list.\n");
 		return;
 	}
+
+	// finding the deck we want to reverse
+
 	node_t *d = get_nth_node(list, deck_index);
 	ll_t *deck = *(ll_t **)d->data;
 
 	node_t *tmp = NULL;
 	node_t *curr = deck->head;
+
+	// swapping the nodes
 
     while (curr != NULL) {
         curr->prev = curr->next;
@@ -464,11 +527,14 @@ void reverse_deck(ll_t *list, int deck_index) {
         tmp = curr;
         curr = curr->prev;
     }
+	// changing the head of the deck
 
     deck->head = tmp;
 
 	printf("The deck %d was successfully reversed.\n", deck_index);
 }
+
+// function for printing the contents of a given deck
 
 void show_deck(ll_t *deck, int deck_index) {
 	printf("Deck %d:\n", deck_index);
@@ -481,6 +547,8 @@ void show_deck(ll_t *deck, int deck_index) {
 	}
 }
 
+// function for printing the entire list of decks
+
 void show_all(ll_t *list) {
 	node_t *curr = list->head;
 	ll_t *deck;
@@ -492,6 +560,8 @@ void show_all(ll_t *list) {
 		index++;
 	}
 }
+
+// function for sorting a given deck using bubble sort
 
 void sort_deck(ll_t *list, int deck_index) {
 	if (deck_index < 0 || deck_index >= list->size) {
@@ -511,6 +581,10 @@ void sort_deck(ll_t *list, int deck_index) {
 				temp = curr->data;
 				curr->data = next_c->data;
 				next_c->data = temp;
+
+			// if both values are equal, then the cards will be sorted
+			// according to their symbol priority
+
 			} else if (card1->value == card2->value) {
 				if (strcmp(card1->symbol, "HEART") != 0 &&
 					strcmp(card2->symbol, "HEART") == 0) {
@@ -542,14 +616,22 @@ void sort_deck(ll_t *list, int deck_index) {
 	printf("The deck %d was successfully sorted.\n", deck_index);
 }
 
+// function used for checking whether the given command has the exact number
+// of indexes it needs
+
 int check_invalid_command(char garb[LINE_MAX]) {
 	fgets(garb, LINE_MAX - 1, stdin);
 	int len = strlen(garb);
+	// if after the given command, we have something other than '\n', then that
+	// means the command is invalid
 	if (len == 1) {
 		return 1;
 	}
 	return 0;
 }
+
+// the next functions are specifically for each command
+// if the command is not valid, then an error message will pop up
 
 void ADD_DECK_COMMAND(ll_t **my_list, int num_cards) {
 	int check = 0, num = 0;
