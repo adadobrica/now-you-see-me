@@ -1,5 +1,5 @@
 #ifndef _UTILS_H_
-#define _UTILS_H
+#define _UTILS_H_
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -51,4 +51,4 @@ void SHOW_DECK_COMMAND(ll_t **my_list);
 void SHOW_ALL_COMMAND(ll_t **my_list);
 void SORT_DECK_COMMAND(ll_t **my_list);
 
-#endif  //  _UTILS_H_ //
+#endif  //  __UTILS_H_

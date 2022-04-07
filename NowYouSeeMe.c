@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "struct.h"
 #include "utils.h"
+#include "struct.h"
 
 #define STRING_SIZE 256
 #define MAX_SYMBOL_SIZE 8
