@@ -224,17 +224,6 @@ void add_cards(ll_t *list, int index, int num) {
 	char card[100], *v, *sym;
 	card_t new_card;
 	while (nr != num) {
-		/*
-		scanf("%d %s", &new_card.value, new_card.symbol);
-		int ok = check_valid_card(&new_card);
-		if (ok == 0) {
-			printf(INVALID_CARD);
-			fgets(garbage, 99, stdin);
-			continue;
-		}
-		add_card(*(ll_t **)current_deck->data, &new_card);
-		nr++;
-		*/
 		fgets(card, STRING_SIZE, stdin);
 		v = strtok(card, " ");
 		sym = strtok(NULL, "\n");
@@ -247,7 +236,7 @@ void add_cards(ll_t *list, int index, int num) {
 			if (ok == 0) {
 				printf(INVALID_CARD);
 				continue;
-			} 
+			}
 			add_card(*(ll_t **)current_deck->data, &new_card);
 			nr++;
 		} else {
@@ -276,12 +265,6 @@ void get_deck_len(ll_t *list, int deck_index) {
 		return;
 	}
 	node_t *current_deck = get_nth_node(list, deck_index);
-	int index = deck_index;
-	/*while (current_deck->next != NULL && index > 0) {
-		current_deck = current_deck->next;
-		--index;
-	}
-*/
 	ll_t *deck;
 	deck = *(ll_t **)current_deck->data;
 	int length = deck->size;
@@ -357,7 +340,7 @@ void merge_decks(ll_t *list, int d_index1, int d_index2) {
 	ll_t *merged_deck = list_create(sizeof(card_t));
 
 	node_t *curr1 = deck1->head, *curr2 = deck2->head;
-	int current_index1 = 0, current_index2 = 0, m_index = 0;
+	int current_index1 = 0, current_index2 = 0;
 	node_t *c1, *c2;
 	card_t *card1, *card2;
 	while (curr1 != NULL && curr2 != NULL) {
@@ -447,6 +430,7 @@ void add_nth_deck(ll_t *list, int n, const void *deck) {
 	}
 	list->size++;
 }
+
 void split_deck(ll_t *list, int d_index, int split_index) {
 	if (d_index >= list->size || d_index < 0) {
 		printf("The provided index is out of bounds for the deck list.\n");
@@ -480,7 +464,6 @@ void split_deck(ll_t *list, int d_index, int split_index) {
 		add_card(new_list, split_card);
 		ind++;
 	}
-	int pos = split_index;
 	while (split_index != deck->size) {
 			remove_nth_node(&deck, deck->size);
 	}
@@ -585,8 +568,7 @@ void sort_deck(ll_t *list, int deck_index) {
 }
 
 int main(void) {
-	ll_t *my_list = list_create(sizeof(ll_t *));
-	ll_t *deck;
+	ll_t *my_list = list_create(sizeof(ll_t *)), *deck;
 	char command[STRING_SIZE], garbage[100];
 	int num_cards, num, check = 0, deck_index, card_index, i1, i2, len;
 	while (1) {
@@ -610,8 +592,8 @@ int main(void) {
 				}
 				check = add_deck_to_list(&deck, my_list);
 				if (check == 1) {
-					printf("The deck was successfully created with %d cards.\n",
-																num_cards);
+					printf("The deck was successfully created with %d cards.\n"
+																,num_cards);
 				}
 			} else {
 				printf(INVALID_COMMAND);
@@ -623,7 +605,8 @@ int main(void) {
 			if (len == 1) {
 				check = delete_deck(my_list, deck_index);
 				if (check == 1) {
-					printf("The deck %d was successfully deleted.\n", deck_index);
+					printf("The deck %d was successfully deleted.\n",
+														deck_index);
 				}
 			} else {
 				printf(INVALID_COMMAND);
