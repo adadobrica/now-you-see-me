@@ -2,10 +2,13 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "struct.h"
+#include "utils.h"
 
 #define STRING_SIZE 256
 #define MAX_SYMBOL_SIZE 8
 #define NUM_SYMBOLS 4
+#define LINE_MAX 100
 #define INVALID_CARD "The provided card is not a valid one.\n"
 #define INVALID_COMMAND "Invalid command. Please try again.\n"
 
@@ -127,13 +130,6 @@ int delete_deck(ll_t *list, int index) {
 		printf("The provided index is out of bounds for the deck list.\n");
 		return -1;
 	}
-	/*
-	if (node == list->head) {
-		list->head = list->head->next;
-		list->size--;
-		printf(DELETED_DECK, index);
-		return;
-	} */
 	int ind = index;
 	while (node->next != NULL && ind-- > 0) {
 		node = node->next;
@@ -221,7 +217,7 @@ void add_cards(ll_t *list, int index, int num) {
 	}
 
 	int nr = 0;
-	char card[100], *v, *sym;
+	char card[LINE_MAX], *v, *sym;
 	card_t new_card;
 	while (nr != num) {
 		fgets(card, STRING_SIZE, stdin);
@@ -383,7 +379,6 @@ void merge_decks(ll_t *list, int d_index1, int d_index2) {
 	printf("The deck %d and the deck %d were successfully merged.\n",
 												d_index1, d_index2);
 }
-
 
 void remove_nth_node(ll_t **list, int n) {
 	node_t *node = (*list)->head;
@@ -567,159 +562,216 @@ void sort_deck(ll_t *list, int deck_index) {
 	printf("The deck %d was successfully sorted.\n", deck_index);
 }
 
+int check_invalid_command(char garb[LINE_MAX]) {
+	fgets(garb, LINE_MAX - 1, stdin);
+	int len = strlen(garb);
+	if (len == 1) {
+		return 1;
+	}
+	return 0;
+}
+
+void ADD_DECK_COMMAND(ll_t **my_list, int num_cards) {
+	int check = 0, num = 0;
+	ll_t *deck = list_create(sizeof(card_t));
+	card_t deck_card;
+	while (num != num_cards) {
+		scanf("%d %s", &deck_card.value, deck_card.symbol);
+		if (check_valid_card(&deck_card) == 0) {
+			printf(INVALID_CARD);
+			continue;
+		}
+		add_card(deck, &deck_card);
+		num++;
+	}
+	check = add_deck_to_list(&deck, *my_list);
+	if (check == 1) {
+		printf("The deck was successfully created with %d cards.\n"
+																, num_cards);
+	}
+}
+
+void DELETE_DECK_COMMAND(ll_t **my_list) {
+	int deck_index, check = 0;
+	char garb[LINE_MAX];
+	scanf("%d", &deck_index);
+	if (check_invalid_command(garb) == 1) {
+		check = delete_deck(*my_list, deck_index);
+		if (check == 1) {
+			printf("The deck %d was successfully deleted.\n",
+														deck_index);
+		}
+	} else {
+		printf(INVALID_COMMAND);
+	}
+}
+
+void DELETE_CARD_COMMAND(ll_t **my_list) {
+	int deck_index, card_index;
+	char garb[LINE_MAX];
+	scanf("%d %d", &deck_index, &card_index);
+	if (check_invalid_command(garb) == 1) {
+		delete_card(*my_list, deck_index, card_index);
+	} else {
+		printf(INVALID_COMMAND);
+	}
+}
+
+void ADD_CARDS_COMMAND(ll_t **my_list) {
+	int deck_index, num_cards;
+	char garb[LINE_MAX];
+	scanf("%d %d", &deck_index, &num_cards);
+	if (check_invalid_command(garb) == 1) {
+		add_cards(*my_list, deck_index, num_cards);
+	} else {
+		printf(INVALID_COMMAND);
+	}
+}
+
+void DECK_NUMBER_COMMAND(ll_t **my_list) {
+	char garb[LINE_MAX];
+	if (check_invalid_command(garb) == 1) {
+		get_deck_number(*my_list);
+	} else {
+		printf(INVALID_COMMAND);
+	}
+}
+
+void DECK_LEN_COMMAND(ll_t **my_list) {
+	int deck_index;
+	char garb[LINE_MAX];
+	scanf("%d", &deck_index);
+	if (check_invalid_command(garb) == 1) {
+		get_deck_len(*my_list, deck_index);
+	} else {
+		printf(INVALID_COMMAND);
+	}
+}
+
+void SHUFFLE_DECK_COMMAND(ll_t **my_list) {
+	int deck_index;
+	char garb[LINE_MAX];
+	scanf("%d", &deck_index);
+	if (check_invalid_command(garb) == 1) {
+		shuffle_deck(*my_list, deck_index);
+	} else {
+		printf(INVALID_COMMAND);
+	}
+}
+
+void MERGE_DECKS_COMMAND(ll_t **my_list) {
+	int i1, i2;
+	char garb[LINE_MAX];
+	scanf("%d %d", &i1, &i2);
+	if (check_invalid_command(garb) == 1) {
+		merge_decks(*my_list, i1, i2);
+	} else {
+		printf(INVALID_COMMAND);
+	}
+}
+
+void SPLIT_DECK_COMMAND(ll_t **my_list) {
+	int i1, i2;
+	char garb[LINE_MAX];
+	scanf("%d %d", &i1, &i2);
+	if (check_invalid_command(garb) == 1) {
+		split_deck(*my_list, i1, i2);
+	} else {
+		printf(INVALID_COMMAND);
+	}
+}
+
+void REVERSE_DECK_COMMAND(ll_t **my_list) {
+	int deck_index;
+	char garb[LINE_MAX];
+	scanf("%d", &deck_index);
+	if (check_invalid_command(garb) == 1) {
+		reverse_deck(*my_list, deck_index);
+	} else {
+		printf(INVALID_COMMAND);
+	}
+}
+
+void SHOW_DECK_COMMAND(ll_t **my_list) {
+	int deck_index;
+	char garb[LINE_MAX];
+	scanf("%d", &deck_index);
+	if (check_invalid_command(garb) == 1) {
+		if (deck_index < 0 || deck_index >= (*my_list)->size) {
+			printf("The provided index is out of bounds for the deck list.\n");
+		} else {
+	        node_t *d = get_nth_node(*my_list, deck_index);
+			ll_t *s_deck = *(ll_t **)d->data;
+			show_deck(s_deck, deck_index);
+		}
+	} else {
+		printf(INVALID_COMMAND);
+	}
+}
+
+void SHOW_ALL_COMMAND(ll_t **my_list) {
+	char garb[LINE_MAX];
+	if (check_invalid_command(garb) == 1) {
+		show_all(*my_list);
+	} else {
+		printf(INVALID_COMMAND);
+	}
+}
+
+void SORT_DECK_COMMAND(ll_t **my_list) {
+	int deck_index;
+	char garb[LINE_MAX];
+	scanf("%d", &deck_index);
+	if (check_invalid_command(garb) == 1) {
+		sort_deck(*my_list, deck_index);
+	} else {
+		printf(INVALID_COMMAND);
+	}
+}
+
 int main(void) {
-	ll_t *my_list = list_create(sizeof(ll_t *)), *deck;
-	char command[STRING_SIZE], garbage[100];
-	int num_cards, num, check = 0, deck_index, card_index, i1, i2, len;
+	ll_t *my_list = list_create(sizeof(ll_t *));
+	char command[STRING_SIZE], garb[LINE_MAX];
+	int num_cards, deck_index, card_index, i1, i2;
 	while (1) {
 		scanf("%s", command);
 		if (strcmp(command, "ADD_DECK") == 0) {
 			scanf("%d", &num_cards);
-			fgets(garbage, 99, stdin);
-			len = strlen(garbage);
-			if (len == 1) {
-				deck = list_create(sizeof(card_t));
-				num = 0;
-				card_t deck_card;
-				while (num != num_cards) {
-					scanf("%d %s", &deck_card.value, deck_card.symbol);
-					if (check_valid_card(&deck_card) == 0) {
-						printf(INVALID_CARD);
-						continue;
-					}
-					add_card(deck, &deck_card);
-					num++;
-				}
-				check = add_deck_to_list(&deck, my_list);
-				if (check == 1) {
-					printf("The deck was successfully created with %d cards.\n"
-																,num_cards);
-				}
+			if (check_invalid_command(garb) == 1) {
+				ADD_DECK_COMMAND(&my_list, num_cards);
 			} else {
 				printf(INVALID_COMMAND);
 			}
 		} else if (strcmp(command, "DEL_DECK") == 0) {
-			scanf("%d", &deck_index);
-			fgets(garbage, 99, stdin);
-			len = strlen(garbage);
-			if (len == 1) {
-				check = delete_deck(my_list, deck_index);
-				if (check == 1) {
-					printf("The deck %d was successfully deleted.\n",
-														deck_index);
-				}
-			} else {
-				printf(INVALID_COMMAND);
-			}
+			DELETE_DECK_COMMAND(&my_list);
 		} else if (strcmp(command, "DEL_CARD") == 0) {
-			scanf("%d %d", &deck_index, &card_index);
-			fgets(garbage, 99, stdin);
-			len = strlen(garbage);
-			if (len == 1) {
-				delete_card(my_list, deck_index, card_index);
-			} else {
-				printf(INVALID_COMMAND);
-			}
+			DELETE_CARD_COMMAND(&my_list);
 		} else if (strcmp(command, "ADD_CARDS") == 0) {
-			scanf("%d %d", &deck_index, &num_cards);
-			fgets(garbage, 99, stdin);
-			len = strlen(garbage);
-			if (len == 1) {
-				add_cards(my_list, deck_index, num_cards);
-			} else {
-				printf(INVALID_COMMAND);
-			}
+			ADD_CARDS_COMMAND(&my_list);
 		} else if (strcmp(command, "DECK_NUMBER") == 0) {
-			fgets(garbage, 99, stdin);
-			len = strlen(garbage);
-			if (len == 1) {
-				get_deck_number(my_list);
-			} else {
-				printf(INVALID_COMMAND);
-			}
+			DECK_NUMBER_COMMAND(&my_list);
 		} else if (strcmp(command, "DECK_LEN") == 0) {
-			scanf("%d", &deck_index);
-			fgets(garbage, 99, stdin);
-			len = strlen(garbage);
-			if (len == 1) {
-				get_deck_len(my_list, deck_index);
-			} else {
-				printf(INVALID_COMMAND);
-			}
+			DECK_LEN_COMMAND(&my_list);
 		} else if (strcmp(command,  "SHUFFLE_DECK") == 0) {
-			scanf("%d", &deck_index);
-			fgets(garbage, 99, stdin);
-			len = strlen(garbage);
-			if (len == 1) {
-				shuffle_deck(my_list, deck_index);
-			} else {
-				printf(INVALID_COMMAND);
-			}
+			SHUFFLE_DECK_COMMAND(&my_list);
 		} else if (strcmp(command, "MERGE_DECKS") == 0) {
-			scanf("%d %d", &i1, &i2);
-			fgets(garbage, 99, stdin);
-			len = strlen(garbage);
-			if (len == 1) {
-				merge_decks(my_list, i1, i2);
-			} else {
-				printf(INVALID_COMMAND);
-			}
+			MERGE_DECKS_COMMAND(&my_list);
 		} else if (strcmp(command, "SPLIT_DECK") == 0) {
-			scanf("%d %d", &i1, &i2);
-			fgets(garbage, 99, stdin);
-			len = strlen(garbage);
-			if (len == 1) {
-				split_deck(my_list, i1, i2);
-			} else {
-				printf(INVALID_COMMAND);
-			}
+			SPLIT_DECK_COMMAND(&my_list);
 		} else if (strcmp(command, "REVERSE_DECK") == 0) {
-			scanf("%d", &deck_index);
-			fgets(garbage, 99, stdin);
-			len = strlen(garbage);
-			if (len == 1) {
-				reverse_deck(my_list, deck_index);
-			} else {
-				printf(INVALID_COMMAND);
-			}
+			REVERSE_DECK_COMMAND(&my_list);
 		} else if (strcmp(command, "SHOW_DECK") == 0) {
-			scanf("%d", &deck_index);
-			fgets(garbage, 99, stdin);
-			len = strlen(garbage);
-			if (len == 1) {
-				if (deck_index < 0 || deck_index >= my_list->size) {
-					printf("The provided index is out of bounds for the deck list.\n");
-				} else {
-	        		node_t *d = get_nth_node(my_list, deck_index);
-					ll_t *s_deck = *(ll_t **)d->data;
-					show_deck(s_deck, deck_index);
-				}
-			} else {
-				printf(INVALID_COMMAND);
-			}
+			SHOW_DECK_COMMAND(&my_list);
 		} else if (strcmp(command, "SHOW_ALL") == 0) {
-			fgets(garbage, 99, stdin);
-			len = strlen(garbage);
-			if (len == 1) {
-				show_all(my_list);
-			} else {
-				printf(INVALID_COMMAND);
-			}
+			SHOW_ALL_COMMAND(&my_list);
 		} else if (strcmp(command, "EXIT") == 0) {
 			free_main_list(&my_list);
 			break;
 		} else if (strcmp(command, "SORT_DECK") == 0) {
-			scanf("%d", &deck_index);
-			fgets(garbage, 99, stdin);
-			len = strlen(garbage);
-			if (len == 1) {
-				sort_deck(my_list, deck_index);
-			} else {
-				printf(INVALID_COMMAND);
-			}
+			SORT_DECK_COMMAND(&my_list);
 		} else {
 			printf(INVALID_COMMAND);
-			fgets(garbage, 99, stdin);
+			fgets(garb, LINE_MAX - 1, stdin);
 		}
 	}
 	return 0;
